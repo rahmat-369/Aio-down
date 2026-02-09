@@ -1,0 +1,190 @@
+.page {
+  min-height: 100vh;
+  background: #f3f4f6;
+  padding: 25px;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.08);
+  font-family: Arial, sans-serif;
+}
+
+.title {
+  font-size: 32px;
+  margin: 0;
+  font-weight: bold;
+  color: #111827;
+}
+
+.desc {
+  margin-top: 10px;
+  color: #4b5563;
+  line-height: 1.6;
+}
+
+.inputBox {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.input {
+  flex: 1;
+  min-width: 250px;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  font-size: 14px;
+}
+
+.button {
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #111827;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: #000;
+}
+
+.error {
+  margin-top: 15px;
+  color: red;
+  font-weight: bold;
+}
+
+.resultCard {
+  margin-top: 25px;
+  padding: 20px;
+  border-radius: 14px;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+}
+
+.resultTitle {
+  margin: 0;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.meta {
+  margin-top: 8px;
+  font-size: 14px;
+}
+
+.filterBox {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.filterBtn {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.filterActive {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: white;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.mediaList {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.mediaItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px;
+  border-radius: 12px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.preview {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+}
+
+.mediaInfo {
+  flex: 1;
+  min-width: 200px;
+}
+
+.mediaType {
+  margin: 0;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.mediaExt {
+  margin: 0;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.downloadBtn {
+  padding: 10px 16px;
+  background: #16a34a;
+  color: white;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.downloadBtn:hover {
+  background: #15803d;
+}
+
+.downloadAll {
+  margin-top: 15px;
+  padding: 12px 18px;
+  background: #2563eb;
+  color: white;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.downloadAll:hover {
+  background: #1d4ed8;
+}
+
+.footer {
+  margin-top: 25px;
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+}
