@@ -1,9 +1,8 @@
 import DownrScraper from "../../lib/downr";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") {
+  if (req.method !== "POST")
     return res.status(405).json({ error: "Method not allowed" });
-  }
 
   try {
     const { url } = req.body;
@@ -12,24 +11,20 @@ export default async function handler(req, res) {
     const downr = new DownrScraper();
     const data = await downr.fetch(url);
 
-    if (!data?.medias?.length) {
+    if (!data?.medias?.length)
       return res.status(404).json({ error: "Media tidak ditemukan" });
-    }
 
-    const medias = data.medias.map((m) => ({
-      type: m.type,
-      url: m.url,
-      quality: m.quality || null,
-      ext: m.ext || null,
-    }));
-
-    return res.status(200).json({
-      title: data.title || null,
+    return res.json({
+      title: data.title || "",
       source: url,
-      medias,
+      medias: data.medias.map((m) => ({
+        type: m.type,
+        url: m.url,
+        quality: m.quality || "",
+      })),
     });
-  } catch (err) {
-    console.error(err);
-    return res.status(500).json({ error: "Server error" });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "Server error" });
   }
-    }
+      }
