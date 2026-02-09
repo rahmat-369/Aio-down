@@ -16,7 +16,6 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: "Media tidak ditemukan" });
     }
 
-    // Rapihin output biar enak dipakai frontend
     const medias = data.medias.map((m) => ({
       type: m.type,
       url: m.url,
@@ -33,4 +32,4 @@ export default async function handler(req, res) {
     console.error(err);
     return res.status(500).json({ error: "Server error" });
   }
-}
+    }
