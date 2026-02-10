@@ -2,56 +2,49 @@
 import { useEffect, useMemo, useState } from "react";
 
 /**
- * ✅ FULL 1 FILE
- * - Intro (nama website + deskripsi) SEBELUM input
- * - Input/tool card setelah info website
- * - Result: type filter + quality filter (TikTok/umum) + preview + download (SEMUA media)
- * - Long text collapse + "lihat semua"
- * - Join WhatsApp card + logo WA + nama channel yang BENAR + dev name yang BENAR
- * - Empty state sections biar gak kosong (How it works + highlights + join)
- * - Full width, desktop + mobile (DeX friendly)
- * - No header/navbar di atas
- *
- * NOTE:
- * - Tombol download pakai /api/proxy?url=...
- * - Ambil media pakai /api/download (POST {url})
+ * FULL 1 FILE (based on your 1131 lines version)
+ * Update requested:
+ * 1) Intro website first (no card) with website name + colored highlight
+ * 2) Tool/Input card AFTER intro
+ * 3) Remove top header/navbar (none)
+ * 4) Join WhatsApp card with WA logo + correct channel name + dev name
+ * 5) Keep ALL existing features: preview+download for all items, filters, quality filter, long text collapse
+ * 6) Fix responsive spacing so text doesn't smash together on mobile
  */
 
-/* ===================== CONFIG ===================== */
-const WEBSITE_TITLE_LEFT = "All In One Social Media";
-const WEBSITE_TITLE_HIGHLIGHT = "Downloader"; // bagian warna beda
 const DEV_NAME = "R_hmt ofc";
+const SITE_NAME_LEFT = "All In One Social Media";
+const SITE_NAME_HI = "Downloader";
 
+const WA_CHANNEL_URL =
+  "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
 const WA_CHANNEL_NAME = "✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧";
-const WA_CHANNEL_URL = "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
 
-// Placeholder background (ganti sesuka lu)
 const PLATFORM_BG = {
   default:
-    "https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=2000&q=80",
   tiktok:
-    "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=2000&q=80",
   instagram:
-    "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=2000&q=80",
   youtube:
-    "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=2000&q=80",
   facebook:
-    "https://images.unsplash.com/photo-1611162618071-b39a2ec05542?auto=format&fit=crop&w=2400&q=80",
-  x: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1611162618071-b39a2ec05542?auto=format&fit=crop&w=2000&q=80",
+  x: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=2000&q=80",
   threads:
-    "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=2000&q=80",
   pinterest:
-    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=2000&q=80",
   snapchat:
-    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=2000&q=80",
   spotify:
-    "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=2000&q=80",
   soundcloud:
-    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=2400&q=80",
+    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=2000&q=80",
 };
 
-/* ===================== HELPERS ===================== */
-function detectPlatformKey(url = "") {
+function detectPlatform(url = "") {
   const u = (url || "").toLowerCase();
   if (u.includes("tiktok.com")) return "tiktok";
   if (u.includes("instagram.com")) return "instagram";
@@ -66,19 +59,13 @@ function detectPlatformKey(url = "") {
   return "default";
 }
 
-function detectPlatformLabel(url = "") {
-  const k = detectPlatformKey(url);
-  if (k === "default") return "UNKNOWN";
-  return k.toUpperCase();
-}
-
-function clampText(text = "", limit = 240) {
+function clampText(text = "", limit = 260) {
   if (!text) return { short: "", isLong: false };
   const isLong = text.length > limit;
   return { short: isLong ? text.slice(0, limit) + "…" : text, isLong };
 }
 
-function shortUrl(url = "", limit = 80) {
+function shortUrl(url = "", limit = 72) {
   if (!url) return "";
   return url.length > limit ? url.slice(0, limit) + "…" : url;
 }
@@ -93,75 +80,60 @@ function safeFilename(str = "") {
 
 function normalizeQuality(q = "") {
   const s = (q || "").toLowerCase();
-  // TikTok style
   if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
     return "HD • No Watermark";
   if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark"))
     return "No Watermark";
   if (s.includes("watermark")) return "Watermark";
   if (s.includes("hd")) return "HD";
-  // fallback
   return q || "";
 }
 
 function qualityTagKey(q = "") {
   const s = (q || "").toLowerCase();
-  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark"))) return "hd_nw";
-  if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark")) return "nw";
+  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
+    return "hd_nw";
+  if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark"))
+    return "nw";
   if (s.includes("watermark")) return "wm";
   if (s.includes("hd")) return "hd";
   return "other";
 }
 
-function isProbablyUrl(s = "") {
-  return /^https?:\/\//i.test((s || "").trim());
-}
-
-/* ===================== COMPONENT ===================== */
 export default function Home() {
-  // Tool state
   const [url, setUrl] = useState("");
-  const [platformKey, setPlatformKey] = useState("default");
-  const [platformLabel, setPlatformLabel] = useState("UNKNOWN");
+  const [platform, setPlatform] = useState("default");
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Response state: {title, source, medias:[{type,url,quality}]}
   const [data, setData] = useState(null);
 
-  // Filters
-  const [typeFilter, setTypeFilter] = useState("all"); // all|video|image|audio
-  const [qualityFilter, setQualityFilter] = useState("all"); // all|hd_nw|nw|hd|wm|other (dynamic)
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [qualityFilter, setQualityFilter] = useState("all");
 
-  // Title collapse
   const [showFullTitle, setShowFullTitle] = useState(false);
 
-  // Preview modal
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
 
-  // Intro animations (tiny polish)
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-
-  // Detect platform from input
   useEffect(() => {
-    setPlatformKey(detectPlatformKey(url));
-    setPlatformLabel(detectPlatformLabel(url));
+    setPlatform(detectPlatform(url));
   }, [url]);
 
-  // Background image depends on detected platform
-  const heroBg = PLATFORM_BG[platformKey] || PLATFORM_BG.default;
+  const bg = PLATFORM_BG[platform] || PLATFORM_BG.default;
+  const platformLabel = platform === "default" ? "UNKNOWN" : platform.toUpperCase();
 
-  // Build quality options from current data (video medias)
+  const title = data?.title || "";
+  const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
+
   const qualityOptions = useMemo(() => {
     const medias = data?.medias || [];
-    const vids = medias.filter((m) => m?.type === "video");
-    const set = new Map(); // key -> label
+    const vids = medias.filter((m) => m.type === "video");
+    const set = new Map();
 
     for (const v of vids) {
-      const raw = v?.quality || "";
+      const raw = v.quality || "";
       const key = qualityTagKey(raw);
       const label = normalizeQuality(raw) || "Other";
       if (key === "other" && !raw) continue;
@@ -176,28 +148,22 @@ export default function Home() {
     return arr;
   }, [data]);
 
-  // Reset filters when new data arrives
   useEffect(() => {
-    setTypeFilter("all");
     setQualityFilter("all");
+    setTypeFilter("all");
     setShowFullTitle(false);
   }, [data?.source]);
 
-  // Filtered medias
   const medias = useMemo(() => {
-    const list = (data?.medias || [])
-      .filter((m) => m?.url && m?.type)
-      .map((m) => ({
-        ...m,
-        qualityLabel: normalizeQuality(m.quality || ""),
-        qualityKey: qualityTagKey(m.quality || ""),
-      }));
+    const list = (data?.medias || []).map((m) => ({
+      ...m,
+      qualityLabel: normalizeQuality(m.quality || ""),
+      qualityKey: qualityTagKey(m.quality || ""),
+    }));
 
     let out = list;
-
     if (typeFilter !== "all") out = out.filter((m) => m.type === typeFilter);
 
-    // Quality filter applies ONLY to video
     if (qualityFilter !== "all") {
       out = out.filter((m) => (m.type === "video" ? m.qualityKey === qualityFilter : true));
     }
@@ -205,26 +171,21 @@ export default function Home() {
     return out;
   }, [data, typeFilter, qualityFilter]);
 
-  // Title display
-  const title = data?.title || "";
-  const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
-
-  // Submit handler
   async function onSubmit() {
     setError("");
     setData(null);
     setShowFullTitle(false);
 
-    const input = (url || "").trim();
-    if (!input) return setError("Masukkan URL dulu.");
-    if (!isProbablyUrl(input)) return setError("URL harus diawali http:// atau https://");
+    const u = url.trim();
+    if (!u) return setError("Masukkan URL dulu.");
+    if (!/^https?:\/\//i.test(u)) return setError("URL harus diawali http:// atau https://");
 
     setLoading(true);
     try {
       const res = await fetch("/api/download", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: input }),
+        body: JSON.stringify({ url: u }),
       });
 
       const txt = await res.text();
@@ -240,7 +201,7 @@ export default function Home() {
 
       const normalized = {
         title: json.title || "",
-        source: json.source || input,
+        source: json.source || u,
         medias: (json.medias || [])
           .filter((m) => m?.url && m?.type)
           .map((m) => ({
@@ -257,11 +218,11 @@ export default function Home() {
     setLoading(false);
   }
 
-  // Preview modal controls
   function openPreview(item) {
     setPreviewItem(item);
     setPreviewOpen(true);
   }
+
   function closePreview() {
     setPreviewOpen(false);
     setPreviewItem(null);
@@ -280,22 +241,13 @@ export default function Home() {
     return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(name || "download")}`;
   }
 
-  // UI flags
   const hasData = !!data;
-  const showQualityFilter = qualityOptions.length > 1; // show if any quality exists in videos
 
   return (
-    <div className={`page ${mounted ? "mounted" : ""}`}>
-      {/* ===================== BACKDROP / AMBIENCE ===================== */}
-      <div className="ambient">
-        <div className="glow g1" />
-        <div className="glow g2" />
-        <div className="grain" />
-      </div>
-
-      {/* ===================== INTRO (TANPA CARD) ===================== */}
+    <div className="page">
+      {/* INTRO (NO CARD) */}
       <section className="intro">
-        <div className="introInner">
+        <div className="container">
           <div className="kicker">
             <span className="kDot" />
             <span className="kText">Welcome</span>
@@ -304,278 +256,271 @@ export default function Home() {
           </div>
 
           <h1 className="title">
-            {WEBSITE_TITLE_LEFT}{" "}
-            <span className="titleHi">{WEBSITE_TITLE_HIGHLIGHT}</span>
+            {SITE_NAME_LEFT} <span className="titleHi">{SITE_NAME_HI}</span>
           </h1>
 
           <p className="desc">
-            Unduh <b>video</b>, <b>image</b>, dan <b>audio</b> dari berbagai platform. Ada{" "}
-            <b>Preview</b> dulu sebelum <b>Download</b>. Tampilan dibuat nyaman untuk mobile & desktop (DeX friendly).
+            Unduh <b>video</b>, <b>image</b>, dan <b>audio</b> dari berbagai platform sosial media.
+            Ada <b>Preview</b> dulu sebelum <b>Download</b>. Tampilan nyaman untuk mobile & desktop (DeX friendly).
           </p>
 
-          <div className="supportRow">
-            <span className="supportLabel">Supported:</span>
-            <span className="supportItems">
+          <p className="supported">
+            <span className="supLabel">Supported:</span>
+            <span className="supItems">
               TikTok • Instagram • Facebook • X • YouTube • Threads • Pinterest • Snapchat • Spotify • SoundCloud
             </span>
-          </div>
+          </p>
 
-          <div className="introMeta">
-            <span className="metaPill">Preview-first</span>
-            <span className="metaPill">Download button always</span>
-            <span className="metaPill">Minimal UI</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ===================== TOOL CARD (INPUT SETELAH INFO) ===================== */}
-      <section className="toolWrap">
-        <div className="toolHero" style={{ backgroundImage: `url(${heroBg})` }}>
-          <div className="toolOverlay" />
-
-          <div className="toolInner">
-            <div className="toolTop">
-              <div className="brandMini">
-                <span className="brandDot" />
-                <span className="brandName">{DEV_NAME}</span>
-                <span className="brandSub">• tool</span>
-              </div>
-
-              <div className="detected">
-                Detected: <b>{platformLabel}</b>
-              </div>
-            </div>
-
-            <div className="toolTitle">
-              <div className="toolH">Paste your link</div>
-              <div className="toolP">Tempel link → klik Get Media → pilih Preview/Download.</div>
-            </div>
-
-            <div className="inputRow">
-              <input
-                className="input"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="https://..."
-                inputMode="url"
-              />
-              <button className="btnMain" onClick={onSubmit} disabled={loading}>
-                {loading ? "Loading..." : "Get Media"}
-              </button>
-            </div>
-
-            {error && <div className="error">❌ {error}</div>}
-
-            <div className="hint">
-              Tips: YouTube kadang gagal karena URL media expiring/protected (ini dari sumber linknya, bukan UI).
-            </div>
+          <div className="pills">
+            <span className="pill">Preview-first</span>
+            <span className="pill">Download always</span>
+            <span className="pill">Minimal UI</span>
           </div>
         </div>
       </section>
 
-      {/* ===================== EMPTY STATE (BIAR GA KOSONG) ===================== */}
+      {/* TOOL CARD (AFTER INTRO) */}
+      <section className="tool">
+        <div className="container">
+          <div className="toolCard" style={{ backgroundImage: `url(${bg})` }}>
+            <div className="toolOverlay" />
+
+            <div className="toolInner">
+              <div className="toolTop">
+                <div className="miniBrand">
+                  <span className="brandDot" />
+                  <span className="brandName">{DEV_NAME}</span>
+                  <span className="brandSub">• tool</span>
+                </div>
+
+                <div className="badge">
+                  Detected: <b>{platformLabel}</b>
+                </div>
+              </div>
+
+              <div className="toolTitle">
+                <div className="toolH">Paste your link</div>
+                <div className="toolP">Tempel link → klik Get Media → pilih Preview/Download.</div>
+              </div>
+
+              <div className="inputRow">
+                <input
+                  className="input"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                  placeholder="https://..."
+                  inputMode="url"
+                />
+                <button className="btnMain" onClick={onSubmit} disabled={loading}>
+                  {loading ? "Loading..." : "Get Media"}
+                </button>
+              </div>
+
+              {error && <div className="error">❌ {error}</div>}
+
+              <div className="hint">
+                Tips: YouTube kadang gagal karena URL media expiring/protected (ini dari sumber linknya, bukan UI).
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* EMPTY STATE (BIAR GA KOSONG) */}
       {!hasData && (
         <>
-          <section className="sectionPad">
-            <div className="howCard">
-              <div className="howItem">
-                <div className="howIcon">①</div>
-                <div className="howText">
-                  <div className="howTitle">Paste Link</div>
-                  <div className="howDesc">Masukkan link sosial media yang kamu mau unduh.</div>
+          <section className="section">
+            <div className="container">
+              <div className="howCard">
+                <div className="howItem">
+                  <div className="howNum">①</div>
+                  <div>
+                    <div className="howTitle">Paste Link</div>
+                    <div className="howDesc">Masukkan link sosial media yang kamu mau unduh.</div>
+                  </div>
+                </div>
+
+                <div className="howItem">
+                  <div className="howNum">②</div>
+                  <div>
+                    <div className="howTitle">Preview</div>
+                    <div className="howDesc">Cek dulu kualitas / tipe media sebelum download.</div>
+                  </div>
+                </div>
+
+                <div className="howItem">
+                  <div className="howNum">③</div>
+                  <div>
+                    <div className="howTitle">Download</div>
+                    <div className="howDesc">Download langsung—video, audio, maupun image.</div>
+                  </div>
                 </div>
               </div>
 
-              <div className="howItem">
-                <div className="howIcon">②</div>
-                <div className="howText">
-                  <div className="howTitle">Preview</div>
-                  <div className="howDesc">Cek dulu kualitas / tipe media sebelum download.</div>
+              <div className="featureGrid">
+                <div className="featureCard">
+                  <div className="fTitle">⚡ Auto-Select</div>
+                  <div className="fDesc">Pilih kualitas terbaik kalau tersedia. Filter tetap ada buat manual.</div>
                 </div>
-              </div>
-
-              <div className="howItem">
-                <div className="howIcon">③</div>
-                <div className="howText">
-                  <div className="howTitle">Download</div>
-                  <div className="howDesc">Download langsung—video, audio, maupun image.</div>
+                <div className="featureCard">
+                  <div className="fTitle">🔒 Proxy Download</div>
+                  <div className="fDesc">Biar file beneran ke-download (bukan cuma kebuka di tab).</div>
                 </div>
-              </div>
-            </div>
-          </section>
-
-          <section className="sectionPad">
-            <div className="featureGrid">
-              <div className="featureCard">
-                <div className="fTitle">⚡ Auto-Select</div>
-                <div className="fDesc">Pilih kualitas terbaik kalau tersedia (filter quality tetap ada untuk manual).</div>
-              </div>
-              <div className="featureCard">
-                <div className="fTitle">🔒 Proxy Download</div>
-                <div className="fDesc">Download via proxy biar image/video tidak “ke-buka doang” tapi benar-benar unduh.</div>
-              </div>
-              <div className="featureCard">
-                <div className="fTitle">🎯 Consistent UI</div>
-                <div className="fDesc">Semua media selalu punya tombol Preview + Download (biar nggak ada yang hilang).</div>
+                <div className="featureCard">
+                  <div className="fTitle">🎯 Consistent Buttons</div>
+                  <div className="fDesc">Semua media selalu punya tombol Preview + Download (termasuk foto).</div>
+                </div>
               </div>
             </div>
           </section>
         </>
       )}
 
-      {/* ===================== RESULT ===================== */}
+      {/* RESULT */}
       {hasData && (
-        <section className="panelWrap">
-          <div className="panel">
-            <div className="panelTop">
-              <div className="panelTitle">
-                <h2 className="h2">Result</h2>
-                <div className="panelSub">
-                  Source:{" "}
-                  <a className="link" href={data.source} target="_blank" rel="noreferrer">
-                    {shortUrl(data.source, 95)}
-                  </a>
-                </div>
-              </div>
-
-              <div className="filtersWrap">
-                {/* Type Filter */}
-                <div className="filters">
-                  {["all", "video", "image", "audio"].map((t) => (
-                    <button
-                      key={t}
-                      className={typeFilter === t ? "chip chipActive" : "chip"}
-                      onClick={() => setTypeFilter(t)}
-                      type="button"
-                    >
-                      {t.toUpperCase()}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Quality Filter (mencolok tapi nyatu) */}
-                {showQualityFilter && (
-                  <div className="qFilters">
-                    <div className="qTitle">Quality Filter</div>
-                    <div className="qRow">
-                      {qualityOptions.map((q) => (
-                        <button
-                          key={q.key}
-                          className={qualityFilter === q.key ? "qChip qActive" : "qChip"}
-                          onClick={() => setQualityFilter(q.key)}
-                          type="button"
-                        >
-                          {q.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Title collapse */}
-            <div className="meta">
-              <b>Title:</b>{" "}
-              {title ? (
-                <>
-                  {showFullTitle ? title : shortTitle}
-                  {titleLong && (
-                    <span className="seeMore" onClick={() => setShowFullTitle((v) => !v)}>
-                      {showFullTitle ? " Sembunyikan" : " Lihat semua"}
-                    </span>
-                  )}
-                </>
-              ) : (
-                "-"
-              )}
-            </div>
-
-            {/* List */}
-            <div className="list">
-              {medias.map((m, i) => (
-                <div className="item" key={`${m.type}-${i}`}>
-                  <div className="left">
-                    <div className="typeRow">
-                      <span className="type">{m.type.toUpperCase()}</span>
-                      {m.qualityLabel ? <span className="quality">{m.qualityLabel}</span> : null}
-                    </div>
-                    <div className="small">{shortUrl(m.url, 90)}</div>
-                  </div>
-
-                  <div className="actions">
-                    <button className="btn preview" type="button" onClick={() => openPreview(m)}>
-                      Preview
-                    </button>
-                    <a className="btn download" href={buildDownloadLink(m)}>
-                      Download
+        <section className="section">
+          <div className="container">
+            <div className="panel">
+              <div className="panelTop">
+                <div>
+                  <h2 className="h2">Result</h2>
+                  <div className="panelSub">
+                    Source:{" "}
+                    <a className="link" href={data.source} target="_blank" rel="noreferrer">
+                      {shortUrl(data.source, 95)}
                     </a>
                   </div>
                 </div>
-              ))}
 
-              {!medias.length && (
-                <div className="empty">
-                  Tidak ada media untuk filter ini. Coba ganti filter type/quality.
+                <div className="filtersWrap">
+                  <div className="filters">
+                    {["all", "video", "image", "audio"].map((t) => (
+                      <button
+                        key={t}
+                        className={typeFilter === t ? "chip chipActive" : "chip"}
+                        onClick={() => setTypeFilter(t)}
+                        type="button"
+                      >
+                        {t.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+
+                  {qualityOptions.length > 1 && (
+                    <div className="qFilters">
+                      <div className="qTitle">Quality Filter</div>
+                      <div className="qRow">
+                        {qualityOptions.map((q) => (
+                          <button
+                            key={q.key}
+                            className={qualityFilter === q.key ? "qChip qActive" : "qChip"}
+                            onClick={() => setQualityFilter(q.key)}
+                            type="button"
+                          >
+                            {q.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
+              </div>
+
+              <div className="meta">
+                <b>Title:</b>{" "}
+                {title ? (
+                  <>
+                    {showFullTitle ? title : shortTitle}
+                    {titleLong && (
+                      <span className="seeMore" onClick={() => setShowFullTitle((v) => !v)}>
+                        {showFullTitle ? " Sembunyikan" : " Lihat semua"}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  "-"
+                )}
+              </div>
+
+              <div className="list">
+                {medias.map((m, i) => (
+                  <div className="item" key={i}>
+                    <div className="left">
+                      <div className="typeRow">
+                        <span className="type">{m.type.toUpperCase()}</span>
+                        {m.qualityLabel ? <span className="quality">{m.qualityLabel}</span> : null}
+                      </div>
+                      <div className="small">{shortUrl(m.url, 90)}</div>
+                    </div>
+
+                    <div className="actions">
+                      <button className="btn preview" type="button" onClick={() => openPreview(m)}>
+                        Preview
+                      </button>
+                      <a className="btn download" href={buildDownloadLink(m)}>
+                        Download
+                      </a>
+                    </div>
+                  </div>
+                ))}
+
+                {!medias.length && <div className="empty">Tidak ada media untuk filter ini.</div>}
+              </div>
             </div>
           </div>
         </section>
       )}
 
-      {/* ===================== JOIN CHANNEL (SELALU ADA) ===================== */}
-      <section className="sectionPad">
-        <div className="joinCard">
-          <div className="joinLeft">
-            <div className="waLogo" aria-hidden="true">
-              {/* simple WA logo (SVG inline) */}
-              <svg viewBox="0 0 24 24" width="26" height="26" className="waSvg">
-                <path
-                  d="M12 2a9.5 9.5 0 0 0-8.22 14.25L3 22l5.92-1.55A9.5 9.5 0 1 0 12 2z"
-                  fill="currentColor"
-                  opacity="0.22"
-                />
-                <path
-                  d="M12 3.8a8.2 8.2 0 0 0-7.1 12.3l-.5 3.1 3.1-.8A8.2 8.2 0 1 0 12 3.8z"
-                  fill="currentColor"
-                  opacity="0.18"
-                />
-                <path
-                  d="M16.9 13.7c-.2-.1-1.2-.6-1.4-.7-.2-.1-.4-.1-.6.1-.2.2-.7.7-.8.9-.1.1-.3.1-.5 0s-.9-.3-1.7-1.1c-.6-.5-1-1.2-1.1-1.4-.1-.2 0-.4.1-.5l.4-.5c.1-.2.1-.3 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.8-.9 1.9s.9 2.2 1 2.3c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.5 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.2-.5 1.4-1 .2-.5.2-.9.2-1 0-.1-.2-.2-.4-.3z"
-                  fill="currentColor"
-                />
-              </svg>
-            </div>
-
-            <div className="joinText">
-              <div className="joinTitle">{WA_CHANNEL_NAME}</div>
-              <div className="joinDesc">
-                Join WhatsApp Channel untuk update tools, AI, dan perkembangan project.
-                <span className="joinDev">
-                  {" "}
-                  Dev: <b>{DEV_NAME}</b>
-                </span>
+      {/* JOIN WHATSAPP (ALWAYS SHOW) */}
+      <section className="section">
+        <div className="container">
+          <div className="joinCard">
+            <div className="joinLeft">
+              <div className="waLogo" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="26" height="26" className="waSvg">
+                  <path
+                    d="M12 2a9.5 9.5 0 0 0-8.22 14.25L3 22l5.92-1.55A9.5 9.5 0 1 0 12 2z"
+                    fill="currentColor"
+                    opacity="0.22"
+                  />
+                  <path
+                    d="M12 3.8a8.2 8.2 0 0 0-7.1 12.3l-.5 3.1 3.1-.8A8.2 8.2 0 1 0 12 3.8z"
+                    fill="currentColor"
+                    opacity="0.18"
+                  />
+                  <path
+                    d="M16.9 13.7c-.2-.1-1.2-.6-1.4-.7-.2-.1-.4-.1-.6.1-.2.2-.7.7-.8.9-.1.1-.3.1-.5 0s-.9-.3-1.7-1.1c-.6-.5-1-1.2-1.1-1.4-.1-.2 0-.4.1-.5l.4-.5c.1-.2.1-.3 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.8-.9 1.9s.9 2.2 1 2.3c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.5 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.2-.5 1.4-1 .2-.5.2-.9.2-1 0-.1-.2-.2-.4-.3z"
+                    fill="currentColor"
+                  />
+                </svg>
               </div>
-              <div className="joinBadges">
-                <span className="joinTag">Update</span>
-                <span className="joinTag">Tools</span>
-                <span className="joinTag">Code</span>
-                <span className="joinTag">AI</span>
+
+              <div>
+                <div className="joinTitle">{WA_CHANNEL_NAME}</div>
+                <div className="joinDesc">
+                  Join WhatsApp Channel untuk update tools, AI, dan perkembangan project.{" "}
+                  <span className="joinDev">Dev: <b>{DEV_NAME}</b></span>
+                </div>
+                <div className="joinBadges">
+                  <span className="joinTag">Update</span>
+                  <span className="joinTag">Tools</span>
+                  <span className="joinTag">Code</span>
+                  <span className="joinTag">AI</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div className="joinRight">
-            <a className="joinBtn" href={WA_CHANNEL_URL} target="_blank" rel="noreferrer">
-              Join Channel
-            </a>
-            <div className="joinSmall">WhatsApp Official Channel</div>
+            <div className="joinRight">
+              <a className="joinBtn" href={WA_CHANNEL_URL} target="_blank" rel="noreferrer">
+                Join Channel
+              </a>
+              <div className="joinSmall">WhatsApp Official Channel</div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ===================== PREVIEW MODAL ===================== */}
+      {/* PREVIEW MODAL */}
       {previewOpen && previewItem && (
         <div className="modalBackdrop" onMouseDown={closePreview}>
           <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
@@ -593,11 +538,9 @@ export default function Home() {
               {previewItem.type === "image" && (
                 <img className="modalMedia" src={previewItem.url} alt="preview" />
               )}
-
               {previewItem.type === "video" && (
                 <video className="modalMedia" src={previewItem.url} controls />
               )}
-
               {previewItem.type === "audio" && (
                 <audio className="modalAudio" src={previewItem.url} controls />
               )}
@@ -615,16 +558,13 @@ export default function Home() {
         </div>
       )}
 
-      {/* ===================== FOOTER ===================== */}
+      {/* FOOTER */}
       <footer className="footer">
-        <div className="footerLine" />
-        <div className="footerText">
-          © {new Date().getFullYear()} <b>{DEV_NAME}</b> • {WEBSITE_TITLE_LEFT}{" "}
-          <span className="footerHi">{WEBSITE_TITLE_HIGHLIGHT}</span>
-        </div>
+        © {new Date().getFullYear()} <b>{DEV_NAME}</b> • {SITE_NAME_LEFT}{" "}
+        <span className="footerHi">{SITE_NAME_HI}</span>
       </footer>
 
-      {/* ===================== GLOBAL CSS ===================== */}
+      {/* GLOBAL CSS */}
       <style jsx global>{`
         html,
         body,
@@ -641,96 +581,29 @@ export default function Home() {
         }
       `}</style>
 
-      {/* ===================== PAGE CSS ===================== */}
+      {/* PAGE CSS */}
       <style jsx>{`
-        /* --------- page & ambient --------- */
         .page {
           min-height: 100vh;
           width: 100%;
-          color: rgba(255, 255, 255, 0.92);
-          font-family: Arial, sans-serif;
           background: radial-gradient(1100px 600px at 18% 0%, rgba(155, 92, 255, 0.18), transparent 60%),
             radial-gradient(1100px 600px at 82% 0%, rgba(55, 245, 255, 0.14), transparent 60%),
             linear-gradient(180deg, #060812, #0b0f1c);
-          position: relative;
+          color: rgba(255, 255, 255, 0.92);
+          font-family: Arial, sans-serif;
+          padding-bottom: 34px;
         }
 
-        .mounted .introInner,
-        .mounted .toolHero,
-        .mounted .howCard,
-        .mounted .featureGrid,
-        .mounted .joinCard,
-        .mounted .panel {
-          transform: translateY(0);
-          opacity: 1;
-        }
-
-        .ambient {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          z-index: 0;
-        }
-        .glow {
-          position: absolute;
-          filter: blur(70px);
-          opacity: 0.7;
-          border-radius: 999px;
-        }
-        .g1 {
-          width: 520px;
-          height: 520px;
-          left: -160px;
-          top: -140px;
-          background: rgba(155, 92, 255, 0.35);
-        }
-        .g2 {
-          width: 520px;
-          height: 520px;
-          right: -170px;
-          top: -160px;
-          background: rgba(55, 245, 255, 0.24);
-        }
-        .grain {
-          position: absolute;
-          inset: 0;
-          opacity: 0.08;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
-          background-size: 240px 240px;
-        }
-
-        /* --------- layout containers --------- */
-        .intro,
-        .toolWrap,
-        .sectionPad,
-        .panelWrap,
-        .footer {
-          position: relative;
-          z-index: 2;
-        }
-
-        .introInner,
-        .toolHero,
-        .howCard,
-        .featureGrid,
-        .joinCard,
-        .panel {
+        .container {
           width: min(1180px, calc(100% - 24px));
-          margin-left: auto;
-          margin-right: auto;
-          transition: opacity 420ms ease, transform 420ms ease;
-          transform: translateY(8px);
-          opacity: 0.001;
+          margin: 0 auto;
         }
 
-        /* --------- intro section --------- */
+        /* INTRO */
         .intro {
-          padding-top: 26px;
+          padding-top: 18px;
+          padding-bottom: 8px;
         }
-        .introInner {
-          padding: 10px 0 6px;
-        }
-
         .kicker {
           display: flex;
           align-items: center;
@@ -739,12 +612,11 @@ export default function Home() {
           margin-bottom: 10px;
           color: rgba(255, 255, 255, 0.7);
           font-size: 12px;
-          letter-spacing: 0.2px;
         }
         .kDot {
           width: 10px;
           height: 10px;
-          border-radius: 6px;
+          border-radius: 999px;
           background: linear-gradient(135deg, rgba(55, 245, 255, 1), rgba(155, 92, 255, 1), rgba(255, 79, 216, 1));
           box-shadow: 0 0 18px rgba(55, 245, 255, 0.18);
         }
@@ -756,7 +628,7 @@ export default function Home() {
           opacity: 0.6;
         }
         .kSub {
-          opacity: 0.8;
+          opacity: 0.86;
         }
 
         .title {
@@ -764,7 +636,7 @@ export default function Home() {
           font-weight: 950;
           letter-spacing: -0.8px;
           font-size: clamp(30px, 5vw, 54px);
-          line-height: 1.06;
+          line-height: 1.08;
         }
         .titleHi {
           background: linear-gradient(90deg, rgba(55, 245, 255, 0.95), rgba(155, 92, 255, 0.95), rgba(255, 79, 216, 0.95));
@@ -774,38 +646,39 @@ export default function Home() {
         }
 
         .desc {
-          margin: 14px 0 0;
-          max-width: 88ch;
-          line-height: 1.7;
+          margin: 12px 0 0;
+          max-width: 90ch;
+          line-height: 1.8;
           color: rgba(255, 255, 255, 0.74);
           font-size: 14px;
         }
 
-        .supportRow {
+        .supported {
+          margin: 12px 0 0;
+          line-height: 1.8;
+          color: rgba(255, 255, 255, 0.65);
+          font-size: 12px;
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          align-items: baseline;
+        }
+        .supLabel {
+          font-weight: 900;
+          color: rgba(255, 255, 255, 0.8);
+        }
+        .supItems {
+          opacity: 0.9;
+          word-break: break-word;
+        }
+
+        .pills {
           margin-top: 12px;
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
-          align-items: baseline;
-          color: rgba(255, 255, 255, 0.65);
-          font-size: 12px;
-          line-height: 1.7;
         }
-        .supportLabel {
-          font-weight: 900;
-          color: rgba(255, 255, 255, 0.78);
-        }
-        .supportItems {
-          opacity: 0.85;
-        }
-
-        .introMeta {
-          margin-top: 14px;
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-        }
-        .metaPill {
+        .pill {
           padding: 8px 10px;
           border-radius: 999px;
           border: 1px solid rgba(255, 255, 255, 0.12);
@@ -815,22 +688,23 @@ export default function Home() {
           font-weight: 900;
         }
 
-        /* --------- tool card --------- */
-        .toolWrap {
-          margin-top: 18px;
+        /* TOOL */
+        .tool {
+          margin-top: 16px;
         }
-        .toolHero {
+        .toolCard {
+          position: relative;
           border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.45);
+          min-height: 340px;
           background-size: cover;
           background-position: center;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.45);
           overflow: hidden;
-          min-height: 360px;
         }
         @media (min-width: 1024px) {
-          .toolHero {
-            min-height: 430px;
+          .toolCard {
+            min-height: 420px;
           }
         }
         .toolOverlay {
@@ -853,7 +727,7 @@ export default function Home() {
           flex-wrap: wrap;
           align-items: center;
         }
-        .brandMini {
+        .miniBrand {
           display: flex;
           align-items: center;
           gap: 10px;
@@ -862,20 +736,20 @@ export default function Home() {
         .brandDot {
           width: 12px;
           height: 12px;
-          border-radius: 6px;
+          border-radius: 999px;
           background: linear-gradient(135deg, rgba(55, 245, 255, 1), rgba(155, 92, 255, 1), rgba(255, 79, 216, 1));
           box-shadow: 0 0 18px rgba(55, 245, 255, 0.18);
         }
         .brandName {
           font-weight: 950;
-          letter-spacing: 0.2px;
           font-size: 13px;
         }
         .brandSub {
           opacity: 0.65;
           font-size: 12px;
         }
-        .detected {
+
+        .badge {
           padding: 10px 12px;
           border-radius: 999px;
           border: 1px solid rgba(255, 255, 255, 0.16);
@@ -885,13 +759,9 @@ export default function Home() {
           white-space: nowrap;
         }
 
-        .toolTitle {
-          margin-top: 2px;
-        }
         .toolH {
           font-size: 22px;
           font-weight: 950;
-          letter-spacing: -0.3px;
           margin-bottom: 6px;
         }
         .toolP {
@@ -910,7 +780,7 @@ export default function Home() {
           border-radius: 18px;
           padding: 12px;
           backdrop-filter: blur(12px);
-          width: min(780px, 100%);
+          width: min(820px, 100%);
         }
         .input {
           flex: 1;
@@ -922,9 +792,6 @@ export default function Home() {
           color: rgba(255, 255, 255, 0.92);
           outline: none;
         }
-        .input::placeholder {
-          color: rgba(255, 255, 255, 0.42);
-        }
         .btnMain {
           padding: 12px 16px;
           border-radius: 14px;
@@ -933,33 +800,28 @@ export default function Home() {
           font-weight: 950;
           background: rgba(255, 255, 255, 0.94);
           color: rgba(0, 0, 0, 0.92);
-          transition: transform 120ms ease, opacity 120ms ease;
-        }
-        .btnMain:hover {
-          transform: translateY(-1px);
         }
         .btnMain:disabled {
           opacity: 0.6;
           cursor: not-allowed;
-          transform: none;
         }
         .error {
           font-weight: 900;
           color: #ff7a7a;
-          margin-top: 2px;
         }
         .hint {
           color: rgba(255, 255, 255, 0.58);
           font-size: 12px;
           line-height: 1.6;
-          margin-top: 2px;
         }
 
-        /* --------- empty state blocks --------- */
-        .sectionPad {
+        /* SECTIONS */
+        .section {
           margin-top: 14px;
         }
+
         .howCard {
+          margin-top: 10px;
           border-radius: 18px;
           border: 1px solid rgba(255, 255, 255, 0.1);
           background: rgba(255, 255, 255, 0.05);
@@ -967,7 +829,7 @@ export default function Home() {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 12px;
-          box-shadow: 0 16px 60px rgba(0, 0, 0, 0.26);
+          box-shadow: 0 16px 60px rgba(0, 0, 0, 0.22);
         }
         @media (max-width: 860px) {
           .howCard {
@@ -983,7 +845,7 @@ export default function Home() {
           border: 1px solid rgba(255, 255, 255, 0.08);
           background: rgba(0, 0, 0, 0.22);
         }
-        .howIcon {
+        .howNum {
           width: 34px;
           height: 34px;
           border-radius: 14px;
@@ -993,7 +855,6 @@ export default function Home() {
           font-weight: 950;
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.1);
-          color: rgba(255, 255, 255, 0.9);
         }
         .howTitle {
           font-weight: 950;
@@ -1006,6 +867,7 @@ export default function Home() {
         }
 
         .featureGrid {
+          margin-top: 12px;
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 12px;
@@ -1032,10 +894,7 @@ export default function Home() {
           color: rgba(255, 255, 255, 0.65);
         }
 
-        /* --------- result panel --------- */
-        .panelWrap {
-          margin-top: 14px;
-        }
+        /* RESULT PANEL */
         .panel {
           border-radius: 18px;
           background: rgba(255, 255, 255, 0.05);
@@ -1049,9 +908,6 @@ export default function Home() {
           gap: 14px;
           align-items: flex-start;
           flex-wrap: wrap;
-        }
-        .panelTitle {
-          min-width: 240px;
         }
         .h2 {
           margin: 0;
@@ -1093,10 +949,6 @@ export default function Home() {
           cursor: pointer;
           font-size: 12px;
           font-weight: 900;
-          transition: transform 120ms ease;
-        }
-        .chip:hover {
-          transform: translateY(-1px);
         }
         .chipActive {
           background: rgba(255, 255, 255, 0.1);
@@ -1130,10 +982,6 @@ export default function Home() {
           cursor: pointer;
           font-size: 12px;
           font-weight: 950;
-          transition: transform 120ms ease;
-        }
-        .qChip:hover {
-          transform: translateY(-1px);
         }
         .qActive {
           border-color: rgba(45, 255, 143, 0.32);
@@ -1216,10 +1064,6 @@ export default function Home() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          transition: transform 120ms ease;
-        }
-        .btn:hover {
-          transform: translateY(-1px);
         }
         .btn.download {
           border-color: rgba(45, 255, 143, 0.32);
@@ -1234,7 +1078,7 @@ export default function Home() {
           background: rgba(0, 0, 0, 0.14);
         }
 
-        /* --------- join card --------- */
+        /* JOIN CARD */
         .joinCard {
           border-radius: 18px;
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -1266,28 +1110,21 @@ export default function Home() {
           color: rgba(45, 255, 143, 0.95);
           flex: 0 0 auto;
         }
-        .waSvg {
-          display: block;
-        }
-        .joinText {
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
         .joinTitle {
           font-weight: 950;
           font-size: 14px;
-          letter-spacing: 0.2px;
         }
         .joinDesc {
           font-size: 12px;
           color: rgba(255, 255, 255, 0.72);
           line-height: 1.6;
+          margin-top: 6px;
         }
         .joinDev {
           color: rgba(255, 255, 255, 0.85);
         }
         .joinBadges {
+          margin-top: 10px;
           display: flex;
           gap: 8px;
           flex-wrap: wrap;
@@ -1320,17 +1157,13 @@ export default function Home() {
           border: 1px solid rgba(45, 255, 143, 0.32);
           background: rgba(45, 255, 143, 0.16);
           color: rgba(255, 255, 255, 0.95);
-          transition: transform 120ms ease;
-        }
-        .joinBtn:hover {
-          transform: translateY(-1px);
         }
         .joinSmall {
           font-size: 11px;
           color: rgba(255, 255, 255, 0.6);
         }
 
-        /* --------- modal preview --------- */
+        /* MODAL */
         .modalBackdrop {
           position: fixed;
           inset: 0;
@@ -1415,25 +1248,16 @@ export default function Home() {
           font-weight: 950;
         }
 
-        /* --------- footer --------- */
+        /* FOOTER */
         .footer {
           margin-top: 22px;
-          padding: 16px 0 28px;
-          text-align: center;
-          z-index: 2;
-          position: relative;
-        }
-        .footerLine {
           width: min(1180px, calc(100% - 24px));
-          margin: 0 auto 10px;
-          height: 1px;
-          background: rgba(255, 255, 255, 0.08);
-        }
-        .footerText {
-          width: min(1180px, calc(100% - 24px));
-          margin: 0 auto;
+          margin-left: auto;
+          margin-right: auto;
+          padding: 10px 0 0;
+          color: rgba(255, 255, 255, 0.55);
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.62);
+          text-align: center;
         }
         .footerHi {
           background: linear-gradient(90deg, rgba(55, 245, 255, 0.95), rgba(155, 92, 255, 0.95), rgba(255, 79, 216, 0.95));
