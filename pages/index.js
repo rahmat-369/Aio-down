@@ -1,12 +1,11 @@
 // pages/index.js
 import { useEffect, useMemo, useState } from "react";
 
-// --- KONFIGURASI & LOGIKA (TIDAK BERUBAH) ---
-
+// --- KONFIGURASI ---
 const WA_CHANNEL_URL = "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
 const WA_CHANNEL_NAME = "✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧";
 const DEV_NAME = "R_hmt ofc";
-const LOGO_URL = "https://a.top4top.io/p_36880pr920.jpeg"; // URL Logo/Background
+const LOGO_URL = "https://a.top4top.io/p_36880pr920.jpeg";
 
 const PLATFORM_BG = {
   default:
@@ -22,28 +21,19 @@ const PLATFORM_BG = {
   x: "https://images.unsplash.com/photo-1611605698383-ee9845280d39?auto=format&fit=crop&w=1600&q=80",
   threads:
     "https://images.unsplash.com/photo-1690322615367-27b0033c5634?auto=format&fit=crop&w=1600&q=80",
-  pinterest:
-    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=80",
-  snapchat:
-    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
   spotify:
     "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=1600&q=80",
-  soundcloud:
-    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1600&q=80",
 };
 
+// --- LOGIC FUNCTIONS ---
 function detectPlatform(url = "") {
   const u = (url || "").toLowerCase();
-  if (u.includes("tiktok.com")) return "tiktok";
-  if (u.includes("instagram.com")) return "instagram";
-  if (u.includes("youtube.com") || u.includes("youtu.be")) return "youtube";
-  if (u.includes("facebook.com") || u.includes("fb.watch")) return "facebook";
-  if (u.includes("x.com") || u.includes("twitter.com")) return "x";
-  if (u.includes("threads.net") || u.includes("threads.com")) return "threads";
-  if (u.includes("pinterest.com") || u.includes("pin.it")) return "pinterest";
-  if (u.includes("snapchat.com")) return "snapchat";
-  if (u.includes("spotify.com")) return "spotify";
-  if (u.includes("soundcloud.com")) return "soundcloud";
+  if (u.includes("tiktok")) return "tiktok";
+  if (u.includes("instagram")) return "instagram";
+  if (u.includes("youtu")) return "youtube";
+  if (u.includes("facebook") || u.includes("fb.watch")) return "facebook";
+  if (u.includes("twitter") || u.includes("x.com")) return "x";
+  if (u.includes("spotify")) return "spotify";
   return "default";
 }
 
@@ -59,17 +49,11 @@ function shortUrl(url = "", limit = 72) {
 }
 
 function safeFilename(str = "") {
-  return (str || "")
-    .replace(/[/\\?%*:|"<>]/g, "-")
-    .replace(/\s+/g, " ")
-    .trim()
-    .slice(0, 80);
+  return (str || "").replace(/[/\\?%*:|"<>]/g, "-").replace(/\s+/g, " ").trim().slice(0, 80);
 }
 
 function normalizeQuality(q = "") {
   const s = (q || "").toLowerCase();
-  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
-    return "HD • No Watermark";
   if (s.includes("no_watermark") || s.includes("nowatermark")) return "No Watermark";
   if (s.includes("watermark")) return "Watermark";
   if (s.includes("hd")) return "HD";
@@ -78,24 +62,23 @@ function normalizeQuality(q = "") {
 
 function qualityTagKey(q = "") {
   const s = (q || "").toLowerCase();
-  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
-    return "hd_nw";
   if (s.includes("no_watermark") || s.includes("nowatermark")) return "nw";
   if (s.includes("watermark")) return "wm";
   if (s.includes("hd")) return "hd";
   return "other";
 }
 
-// Icon WhatsApp SVG (Fixed)
+// Icon WhatsApp SVG (High Visibility)
 const WhatsAppIcon = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width="32"
-    height="32"
-    fill="#fff"
-  >
-    <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.005.54 1.961.884 2.806.884 3.182 0 5.769-2.586 5.769-5.766.001-3.18-2.584-5.767-5.769-5.767zm.992 9.079c-1.745.975-2.859.39-3.078.17-.674-.675-1.928-2.316-1.523-3.692.174-.593.593-.846.858-.888.312-.05.513-.03.626.241.135.324.457 1.106.505 1.196.068.128.02.32-.132.502-.134.16-.184.22-.303.366-.129.158-.291.24-.132.52.164.29.728 1.189 1.564 1.934 1.057.94 1.84 1.137 2.193 1.026.19-.06.772-.821.892-1.053.13-.252.193-.201.442-.086.249.115 1.583.749 1.708.811.125.062.208.093.24.156.031.062.067 1.157-.597 1.638-.597.432-1.393.188-1.393.188zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M12.031 2C6.508 2 2.009 6.49 2 12.016c0 1.77.463 3.447 1.272 4.908l-1.349 4.925 5.042-1.322c1.436.784 3.076 1.236 4.814 1.236 5.523 0 10.017-4.49 10.017-10.017C21.795 6.49 17.554 2 12.031 2zM12.03 20.25c-1.503 0-2.923-.404-4.167-1.11l-2.92.766.78-2.853a8.17 8.17 0 0 1-1.206-4.288c0-4.52 3.676-8.2 8.2-8.2s8.2 3.676 8.2 8.2c0 4.524-3.676 8.2-8.2 8.2z" 
+      fill="#fff" opacity="0.4"
+    />
+    <path 
+      d="M16.735 14.478c-.26-.13-1.538-.76-1.776-.846-.237-.086-.41-.13-.582.13-.173.258-.67.845-.82.1.02-.152.022-.26-.065-.54-.236-.28-.13-.586-.258-.888-.388-.302-.13-.52-.086-.714.237-.194.323-.043.603.13.948.172.344.757.56 1.83 1.023 2.89.605 1.303 1.055 1.583 1.256 1.052.197.393.593.364.914.344.323-.021 1.538-.627 1.754-1.233.216-.606.216-1.124.152-1.233-.065-.107-.237-.172-.496-.301z" 
+      fill="#fff"
+    />
   </svg>
 );
 
@@ -118,7 +101,6 @@ export default function Home() {
   }, [url]);
 
   const bg = PLATFORM_BG[platform] || PLATFORM_BG.default;
-
   const title = data?.title || "";
   const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
 
@@ -126,7 +108,6 @@ export default function Home() {
     const medias = data?.medias || [];
     const vids = medias.filter((m) => m.type === "video");
     const set = new Map();
-
     for (const v of vids) {
       const raw = v.quality || "";
       const key = qualityTagKey(raw);
@@ -134,8 +115,7 @@ export default function Home() {
       if (key === "other" && !raw) continue;
       if (!set.has(key)) set.set(key, label);
     }
-
-    const order = ["hd_nw", "nw", "hd", "wm", "other"];
+    const order = ["nw", "hd", "wm", "other"];
     const arr = [{ key: "all", label: "All Quality" }];
     for (const k of order) {
       if (set.has(k)) arr.push({ key: k, label: set.get(k) });
@@ -153,14 +133,11 @@ export default function Home() {
       qualityLabel: normalizeQuality(m.quality || ""),
       qualityKey: qualityTagKey(m.quality || ""),
     }));
-
     let out = list;
     if (typeFilter !== "all") out = out.filter((m) => m.type === typeFilter);
-
     if (qualityFilter !== "all") {
       out = out.filter((m) => (m.type === "video" ? m.qualityKey === qualityFilter : true));
     }
-
     return out;
   }, [data, typeFilter, qualityFilter]);
 
@@ -168,11 +145,9 @@ export default function Home() {
     setError("");
     setData(null);
     setShowFullTitle(false);
-
     const u = url.trim();
     if (!u) return setError("Masukkan URL dulu.");
-    if (!/^https?:\/\//i.test(u))
-      return setError("URL harus diawali http:// atau https://");
+    if (!/^https?:\/\//i.test(u)) return setError("URL harus diawali http:// atau https://");
 
     setLoading(true);
     try {
@@ -181,99 +156,74 @@ export default function Home() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: u }),
       });
-
       const txt = await res.text();
       let json;
       try {
         json = JSON.parse(txt);
       } catch {
-        throw new Error(
-          "API tidak mengembalikan JSON. Pastikan API ada di pages/api/download.js"
-        );
+        throw new Error("API tidak mengembalikan JSON.");
       }
-
       if (!res.ok || json?.error) throw new Error(json?.error || "Gagal mengambil media.");
       if (!json?.medias?.length) throw new Error("Media tidak ditemukan.");
 
-      const normalized = {
+      setData({
         title: json.title || "",
         source: json.source || u,
-        medias: (json.medias || [])
-          .filter((m) => m?.url && m?.type)
-          .map((m) => ({
-            type: m.type,
-            url: m.url,
-            quality: m.quality || "",
-          })),
-      };
-
-      setData(normalized);
+        medias: (json.medias || []).filter((m) => m?.url && m?.type).map((m) => ({
+          type: m.type, url: m.url, quality: m.quality || "",
+        })),
+      });
     } catch (e) {
       setError(String(e?.message || e));
     }
     setLoading(false);
   }
 
-  function openPreview(item) {
-    setPreviewItem(item);
-    setPreviewOpen(true);
-  }
-
-  function closePreview() {
-    setPreviewOpen(false);
-    setPreviewItem(null);
-  }
-
-  useEffect(() => {
-    function onKey(e) {
-      if (e.key === "Escape") closePreview();
-    }
-    if (previewOpen) window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [previewOpen]);
-
+  function openPreview(item) { setPreviewItem(item); setPreviewOpen(true); }
+  function closePreview() { setPreviewOpen(false); setPreviewItem(null); }
   function buildDownloadLink(item) {
     const name = safeFilename(`${item.type}${item.quality ? "-" + item.quality : ""}`);
-    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(
-      name || "download"
-    )}`;
+    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(name || "download")}`;
   }
 
   return (
     <div className="page">
-      {/* HEADER UTAMA */}
+      {/* HEADER */}
       <header className="header">
-        {/* KIRI: LOGO GAMBAR */}
         <div className="brandLeft">
-          <img src={LOGO_URL} alt="Logo" className="brandLogo" />
+          <div className="logoWrapper">
+            <img src={LOGO_URL} alt="Profile" className="brandLogo" />
+          </div>
+          <div className="brandText">
+            <span className="brandName">{DEV_NAME}</span>
+            <span className="brandSub">Developer</span>
+          </div>
         </div>
         
-        {/* KANAN: SYSTEM STATUS */}
         <div className="systemStatus">
           <div className="statusDot" />
           <span className="statusText">System On</span>
         </div>
       </header>
 
-      {/* HERO SECTION BESAR (Welcome Area) */}
+      {/* HERO SECTION */}
       <section className="heroMain" style={{ backgroundImage: `url(${bg})` }}>
         <div className="heroOverlay" />
         
         <div className="heroContent">
           <div className="heroTexts">
             <h1 className="heroTitle">
-              Universal Social Media <br />
+              Social Media <br />
               <span className="textGradient">Downloader</span>
             </h1>
             <p className="heroDesc">
-              Tools canggih untuk download video, audio, dan gambar dari berbagai platform sosial media tanpa watermark. Gratis, cepat, dan mudah digunakan.
+              Unduh video, audio, dan gambar dari berbagai platform sosial media tanpa watermark dengan kualitas terbaik.
             </p>
           </div>
 
-          {/* INPUT CARD */}
           <div className="inputCard glass">
             <div className="inputLabel">
-              Platform detected: <span className="platformBadge">{platform === 'default' ? 'Auto Detect' : platform.toUpperCase()}</span>
+              Platform: <span className="platformBadge">{platform === 'default' ? 'Auto Detect' : platform.toUpperCase()}</span>
             </div>
             
             <div className="inputRow">
@@ -292,7 +242,7 @@ export default function Home() {
             {error && <div className="errorMsg">⚠️ {error}</div>}
             
             <div className="inputFooter">
-              Support: TikTok • IG • YT • FB • Twitter • Spotify & more
+              Support: TikTok • IG • YT • FB • Twitter • Spotify
             </div>
           </div>
         </div>
@@ -303,7 +253,7 @@ export default function Home() {
         <section className="contentSection slideUp">
           <div className="panel">
             <div className="panelTop">
-              <h2 className="panelH2">Download Result</h2>
+              <h2 className="panelH2">Result Found</h2>
               
               <div className="filtersWrap">
                 <div className="filters">
@@ -317,23 +267,6 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
-
-                {qualityOptions.length > 1 && (
-                  <div className="qFilters">
-                    <div className="qTitle">Pilih Kualitas</div>
-                    <div className="qRow">
-                      {qualityOptions.map((q) => (
-                        <button
-                          key={q.key}
-                          className={qualityFilter === q.key ? "qChip qActive" : "qChip"}
-                          onClick={() => setQualityFilter(q.key)}
-                        >
-                          {q.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -346,20 +279,12 @@ export default function Home() {
                       {showFullTitle ? title : shortTitle}
                       {titleLong && (
                         <span className="seeMore" onClick={() => setShowFullTitle((v) => !v)}>
-                          {showFullTitle ? " Sembunyikan" : " Selengkapnya"}
+                          {showFullTitle ? " Hide" : " Show More"}
                         </span>
                       )}
                     </>
-                  ) : (
-                    "-"
-                  )}
+                  ) : "-"}
                 </span>
-              </div>
-              <div className="metaRow">
-                <span className="metaLabel">Source:</span>
-                <a className="link" href={data.source} target="_blank" rel="noreferrer">
-                  {shortUrl(data.source, 60)} ↗
-                </a>
               </div>
             </div>
 
@@ -371,60 +296,64 @@ export default function Home() {
                       <span className={`typeTag ${m.type}`}>{m.type}</span>
                       {m.quality ? <span className="qualityTag">{normalizeQuality(m.quality)}</span> : null}
                     </div>
-                    <div className="urlPreview">{shortUrl(m.url, 50)}</div>
+                    <div className="urlPreview">{shortUrl(m.url, 40)}</div>
                   </div>
-
                   <div className="actions">
-                    <button className="btnSec" onClick={() => openPreview(m)}>
-                      Preview
-                    </button>
-                    <a className="btnPri" href={buildDownloadLink(m)}>
-                      Download File
-                    </a>
+                    <button className="btnSec" onClick={() => openPreview(m)}>Preview</button>
+                    <a className="btnPri" href={buildDownloadLink(m)}>Download</a>
                   </div>
                 </div>
               ))}
-
               {!medias.length && <div className="emptyState">Tidak ada media untuk filter ini.</div>}
             </div>
           </div>
         </section>
       )}
 
-      {/* INFO CARDS (Tampil jika belum ada data) */}
+      {/* INFO CARDS & WHATSAPP */}
       {!data && (
         <section className="contentSection">
-          {/* FEATURE GRID TERLEBIH DAHULU */}
+          
+          {/* FEATURE GRID TERBARU */}
           <div className="featureGrid">
             <div className="featureCard">
-              <div className="fIcon">⚡</div>
-              <div className="fTitle">Super Cepat</div>
-              <div className="fDesc">Teknologi scraping cerdas yang dioptimalkan untuk kecepatan tanpa jeda.</div>
+              <div className="fIconBox">⚡</div>
+              <div className="fContent">
+                <div className="fTitle">Super Cepat</div>
+                <div className="fDesc">Algoritma optimasi terbaru untuk proses download instan.</div>
+              </div>
             </div>
             <div className="featureCard">
-              <div className="fIcon">🔒</div>
-              <div className="fTitle">Aman & Privat</div>
-              <div className="fDesc">Enkripsi End-to-End, tanpa log history. Privasi Anda adalah prioritas kami.</div>
+              <div className="fIconBox">🔒</div>
+              <div className="fContent">
+                <div className="fTitle">Aman & Privat</div>
+                <div className="fDesc">Privasi terjaga, tanpa log history. Aman untuk semua user.</div>
+              </div>
             </div>
             <div className="featureCard">
-              <div className="fIcon">💎</div>
-              <div className="fTitle">Kualitas Asli</div>
-              <div className="fDesc">Unduh media dengan resolusi tertinggi (4K/HD) tanpa kompresi tambahan.</div>
+              <div className="fIconBox">💎</div>
+              <div className="fContent">
+                <div className="fTitle">Kualitas Asli</div>
+                <div className="fDesc">Download media resolusi tinggi tanpa kompresi tambahan.</div>
+              </div>
             </div>
           </div>
 
-          {/* JOIN WHATSAPP CARD - DI BAWAH FEATURE GRID */}
+          {/* WHATSAPP CARD TERBARU */}
           <div className="waCardWrapper">
             <div className="waCard">
+                <div className="waBgImage" style={{backgroundImage: `url(${LOGO_URL})`}}></div>
                 <div className="waOverlay"></div>
+                
                 <div className="waContentInner">
-                    <div className="waHeader">
-                        <div className="waIconBox">
-                        <WhatsAppIcon />
+                    <div className="waTop">
+                        <div className="waIconCircle">
+                            <WhatsAppIcon />
                         </div>
                         <div className="waMeta">
                             <span className="waTag">OFFICIAL CHANNEL</span>
                             <h3 className="waTitle">{WA_CHANNEL_NAME}</h3>
+                            <span className="waSub">By: {DEV_NAME}</span>
                         </div>
                     </div>
                     
@@ -438,584 +367,277 @@ export default function Home() {
                 </div>
             </div>
           </div>
+
         </section>
       )}
 
-      {/* FOOTER */}
       <footer className="footer">
-        <div className="footerLine"></div>
         <p>© {new Date().getFullYear()} {DEV_NAME} • Built with Passion</p>
       </footer>
 
-      {/* PREVIEW MODAL */}
+      {/* MODAL */}
       {previewOpen && previewItem && (
         <div className="modalBackdrop" onMouseDown={closePreview}>
           <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
             <div className="modalHeader">
-              <span className="modalHTitle">Preview Media</span>
+              <span className="modalHTitle">Preview</span>
               <button className="modalClose" onClick={closePreview}>✕</button>
             </div>
             <div className="modalContent">
-              {previewItem.type === "image" && (
-                <img className="modalMedia" src={previewItem.url} alt="preview" />
-              )}
-              {previewItem.type === "video" && (
-                <video className="modalMedia" src={previewItem.url} controls autoPlay />
-              )}
-              {previewItem.type === "audio" && (
-                <audio className="modalAudio" src={previewItem.url} controls autoPlay />
-              )}
+              {previewItem.type === "image" && <img className="modalMedia" src={previewItem.url} alt="preview" />}
+              {previewItem.type === "video" && <video className="modalMedia" src={previewItem.url} controls autoPlay />}
+              {previewItem.type === "audio" && <audio className="modalAudio" src={previewItem.url} controls autoPlay />}
             </div>
             <div className="modalFooter">
-              <a className="modalBtnDownload" href={buildDownloadLink(previewItem)}>
-                Download Sekarang
-              </a>
+              <a className="modalBtnDownload" href={buildDownloadLink(previewItem)}>Download File</a>
             </div>
           </div>
         </div>
       )}
 
-      {/* GLOBAL CSS */}
+      {/* STYLES */}
       <style jsx global>{`
         html, body {
-          margin: 0;
-          padding: 0;
-          background: #02040a;
-          color: #fff;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+          margin: 0; padding: 0;
+          background: #050505; /* Darker clean bg */
+          color: #eee;
+          font-family: 'Inter', sans-serif;
           overflow-x: hidden;
         }
         * { box-sizing: border-box; }
-        
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0b0f19; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
       `}</style>
 
-      {/* PAGE CSS */}
       <style jsx>{`
-        .page {
-          min-height: 100vh;
-          display: flex;
-          flex-direction: column;
-        }
+        .page { min-height: 100vh; display: flex; flex-direction: column; }
 
         /* HEADER */
         .header {
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
+          position: absolute; top: 0; left: 0; right: 0;
           padding: 20px 24px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
+          display: flex; justify-content: space-between; align-items: center;
           z-index: 50;
         }
-        
-        .brandLogo {
-            width: 42px;
-            height: 42px;
+        .brandLeft { display: flex; align-items: center; gap: 12px; }
+        .logoWrapper {
+            position: relative;
+            width: 40px; height: 40px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid rgba(255,255,255,0.2);
-            transition: transform 0.3s ease;
+            overflow: hidden;
+            border: 2px solid rgba(255,255,255,0.1);
         }
-        .brandLogo:hover {
-            transform: scale(1.1);
-            border-color: #00f2ff;
-        }
+        .brandLogo { width: 100%; height: 100%; object-fit: cover; }
+        .brandText { display: flex; flex-direction: column; justify-content: center; }
+        .brandName { font-weight: 700; font-size: 14px; color: #fff; letter-spacing: 0.5px; }
+        .brandSub { font-size: 10px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
 
-        /* SYSTEM ON STATUS */
         .systemStatus {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(0, 255, 136, 0.1);
-            border: 1px solid rgba(0, 255, 136, 0.2);
-            padding: 6px 14px;
-            border-radius: 20px;
-            backdrop-filter: blur(5px);
+            display: flex; align-items: center; gap: 8px;
+            background: rgba(0, 255, 136, 0.08);
+            border: 1px solid rgba(0, 255, 136, 0.15);
+            padding: 6px 14px; border-radius: 20px;
+            backdrop-filter: blur(8px);
         }
         .statusDot {
-            width: 8px;
-            height: 8px;
-            background-color: #00ff88;
-            border-radius: 50%;
-            box-shadow: 0 0 8px #00ff88;
+            width: 6px; height: 6px; background-color: #00ff88;
+            border-radius: 50%; box-shadow: 0 0 8px #00ff88;
             animation: pulse 2s infinite;
         }
-        .statusText {
-            font-size: 11px;
-            font-weight: 700;
-            color: #00ff88;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-        }
-        
+        .statusText { font-size: 11px; font-weight: 700; color: #00ff88; text-transform: uppercase; }
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
-            70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
-            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
+            70% { box-shadow: 0 0 0 5px rgba(0, 255, 136, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
         }
 
-        /* HERO MAIN */
+        /* HERO */
         .heroMain {
-          position: relative;
-          min-height: 85vh;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          background-size: cover;
-          background-position: center;
+          position: relative; min-height: 85vh;
+          display: flex; align-items: center; justify-content: center;
+          background-size: cover; background-position: center;
           padding: 80px 20px 40px;
-          transition: background-image 0.5s ease;
         }
         .heroOverlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, rgba(2,4,10,0.8) 0%, rgba(2,4,10,0.95) 100%);
+          position: absolute; inset: 0;
+          background: linear-gradient(180deg, rgba(5,5,5,0.85) 0%, #050505 100%);
         }
         .heroContent {
-          position: relative;
-          z-index: 2;
-          width: min(800px, 100%);
-          display: flex;
-          flex-direction: column;
-          gap: 40px;
-          text-align: center;
+          position: relative; z-index: 2; width: min(700px, 100%);
+          display: flex; flex-direction: column; gap: 36px; text-align: center;
         }
-
-        .heroTexts {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 16px;
-        }
-
         .heroTitle {
-          margin: 0;
-          font-size: clamp(32px, 6vw, 64px);
-          line-height: 1.1;
-          font-weight: 900;
-          letter-spacing: -1.5px;
+          font-size: clamp(32px, 6vw, 56px); margin: 0; line-height: 1.1; font-weight: 800; letter-spacing: -1px;
         }
-
         .textGradient {
-          background: linear-gradient(135deg, #00f2ff, #00c3ff, #6a00ff);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          background: linear-gradient(135deg, #fff 30%, #999 100%);
+          -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
+        .heroDesc { font-size: 15px; color: rgba(255,255,255,0.5); margin: 10px 0 0; line-height: 1.6; }
 
-        .heroDesc {
-          margin: 0;
-          font-size: 16px;
-          color: rgba(255,255,255,0.6);
-          max-width: 600px;
-          line-height: 1.6;
-        }
-
-        /* GLASS INPUT CARD */
+        /* INPUT CARD */
         .inputCard {
-          background: rgba(20, 25, 40, 0.6);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255,255,255,0.1);
-          border-radius: 24px;
-          padding: 24px;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-          width: 100%;
+          background: rgba(255,255,255,0.03);
+          backdrop-filter: blur(24px);
+          border: 1px solid rgba(255,255,255,0.06);
+          border-radius: 20px; padding: 24px;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-
-        .inputLabel {
-          text-align: left;
-          font-size: 12px;
-          color: rgba(255,255,255,0.5);
-          margin-bottom: 12px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-        }
-        .platformBadge {
-          color: #00f2ff;
-          font-weight: 700;
-        }
-
-        .inputRow {
-          display: flex;
-          gap: 12px;
-        }
-        
-        @media (max-width: 600px) {
-          .inputRow { flex-direction: column; }
-        }
-
+        .inputLabel { font-size: 11px; color: rgba(255,255,255,0.4); margin-bottom: 12px; text-align: left; }
+        .platformBadge { color: #fff; font-weight: 600; }
+        .inputRow { display: flex; gap: 10px; }
         .input {
-          flex: 1;
-          background: rgba(0,0,0,0.4);
-          border: 1px solid rgba(255,255,255,0.15);
-          color: white;
-          padding: 16px;
-          border-radius: 14px;
-          font-size: 16px;
-          outline: none;
-          transition: border-color 0.2s;
+          flex: 1; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1);
+          color: white; padding: 14px 18px; border-radius: 12px; font-size: 15px; outline: none;
+          transition: all 0.2s;
         }
-        .input:focus {
-          border-color: #00f2ff;
-        }
-
+        .input:focus { border-color: rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); }
         .btnMain {
-          background: white;
-          color: black;
-          font-weight: 800;
-          border: none;
-          padding: 16px 32px;
-          border-radius: 14px;
-          font-size: 16px;
-          cursor: pointer;
-          transition: transform 0.1s, opacity 0.2s;
+          background: #fff; color: #000; font-weight: 700; border: none;
+          padding: 14px 28px; border-radius: 12px; cursor: pointer; font-size: 14px;
+          transition: transform 0.1s;
         }
-        .btnMain:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 10px 20px rgba(255,255,255,0.15);
-        }
-        .btnMain:disabled {
-          opacity: 0.7;
-          transform: none;
-          cursor: not-allowed;
-        }
+        .btnMain:hover { transform: translateY(-1px); background: #f0f0f0; }
+        .btnMain:disabled { opacity: 0.6; cursor: default; transform: none; }
+        .errorMsg { text-align: left; color: #ff6b6b; margin-top: 10px; font-size: 13px; font-weight: 500; }
+        .inputFooter { margin-top: 16px; font-size: 11px; color: rgba(255,255,255,0.3); }
 
-        .errorMsg {
-          text-align: left;
-          color: #ff5555;
-          margin-top: 12px;
-          font-weight: 600;
-          font-size: 14px;
-        }
+        /* CONTENT */
+        .contentSection { width: min(800px, 100%); margin: 0 auto; padding: 40px 20px; }
 
-        .inputFooter {
-          margin-top: 16px;
-          font-size: 12px;
-          color: rgba(255,255,255,0.4);
-          text-align: center;
-        }
-
-        /* CONTENT SECTION */
-        .contentSection {
-          width: min(800px, 100%);
-          margin: 0 auto;
-          padding: 40px 20px;
-        }
-
-        /* FEATURE GRID (PROFESSIONAL LOOK) */
+        /* FEATURE GRID (NEW DESIGN) */
         .featureGrid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 20px;
-          margin-bottom: 40px;
+          display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 16px; margin-bottom: 40px;
         }
         .featureCard {
-          background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+          display: flex; align-items: flex-start; gap: 16px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
           border: 1px solid rgba(255,255,255,0.05);
-          padding: 30px 24px;
-          border-radius: 18px;
+          padding: 20px; border-radius: 16px;
           transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
         }
-        .featureCard:hover { 
-            background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
-            border-color: rgba(0, 242, 255, 0.3);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        .featureCard:hover {
+            border-color: rgba(255,255,255,0.1);
+            transform: translateY(-4px);
+            background: linear-gradient(180deg, rgba(255,255,255,0.07) 0%, rgba(255,255,255,0.02) 100%);
         }
-        .fIcon { font-size: 28px; margin-bottom: 16px; }
-        .fTitle { font-weight: 800; font-size: 17px; margin-bottom: 10px; color: #fff; }
-        .fDesc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+        .fIconBox {
+            font-size: 24px;
+            background: rgba(255,255,255,0.05);
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .fContent { display: flex; flex-direction: column; gap: 4px; }
+        .fTitle { font-weight: 700; font-size: 15px; color: #fff; }
+        .fDesc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
 
-        /* WA CARD WRAPPER */
-        .waCardWrapper {
-            margin-top: 20px;
-        }
-
-        /* WA CARD CUSTOM BG */
+        /* WA CARD (NEW DESIGN) */
         .waCard {
-          position: relative;
-          background-image: url('${LOGO_URL}');
-          background-size: cover;
-          background-position: center;
-          border-radius: 24px;
-          overflow: hidden;
-          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-          border: 1px solid rgba(255,255,255,0.1);
+          position: relative; border-radius: 24px; overflow: hidden;
+          min-height: 240px; border: 1px solid rgba(255,255,255,0.08);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
-
+        .waBgImage {
+            position: absolute; inset: 0; background-size: cover; background-position: center;
+            filter: blur(2px); transform: scale(1.1);
+        }
         .waOverlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
-            z-index: 1;
+            position: absolute; inset: 0;
+            background: rgba(0,0,0,0.65); /* Overlay lebih gelap agar teks terbaca */
+            backdrop-filter: blur(10px);
         }
-
         .waContentInner {
-            position: relative;
-            z-index: 2;
-            padding: 30px;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+            position: relative; z-index: 2; padding: 32px;
+            display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+            height: 100%; gap: 20px;
         }
-
-        .waHeader {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        .waTop { display: flex; align-items: center; gap: 16px; }
+        .waIconCircle {
+            width: 54px; height: 54px; background: #25D366; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
         }
-
-        .waIconBox {
-          width: 56px;
-          height: 56px;
-          background: #25D366;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
-        }
-        
-        .waMeta { display: flex; flex-direction: column; gap: 4px; }
-        .waTag {
-            font-size: 10px;
-            font-weight: 900;
-            color: #25D366;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-        }
-        .waTitle {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .waDesc {
-          font-size: 14px;
-          color: rgba(255,255,255,0.8);
-          line-height: 1.6;
-          margin: 0;
-          max-width: 600px;
-        }
+        .waMeta { display: flex; flex-direction: column; }
+        .waTag { font-size: 10px; color: #25D366; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; }
+        .waTitle { font-size: 18px; font-weight: 700; margin: 0; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+        .waSub { font-size: 11px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+        .waDesc { font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6; max-width: 500px; margin: 0; }
         
         .waBtn {
-          align-self: flex-start;
-          background: #25D366;
-          color: #000;
-          text-decoration: none;
-          padding: 14px 28px;
-          border-radius: 12px;
-          font-weight: 800;
-          font-size: 14px;
-          transition: transform 0.2s, box-shadow 0.2s;
+            background: #25D366; color: #000; text-decoration: none;
+            padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 13px;
+            transition: all 0.2s; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2);
         }
-        .waBtn:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
-            background: #20bd5a;
-        }
+        .waBtn:hover { transform: translateY(-2px); background: #22c35e; }
 
         @media (max-width: 600px) {
-            .waHeader { flex-direction: column; text-align: center; }
+            .inputRow { flex-direction: column; }
             .waContentInner { align-items: center; text-align: center; }
-            .waBtn { align-self: center; }
+            .waTop { flex-direction: column; gap: 12px; }
         }
 
         /* RESULT PANEL */
         .panel {
-          background: #0e121b;
-          border-radius: 24px;
-          border: 1px solid rgba(255,255,255,0.1);
-          padding: 24px;
-          box-shadow: 0 4px 30px rgba(0,0,0,0.3);
+          background: #0a0a0a; border-radius: 20px;
+          border: 1px solid rgba(255,255,255,0.08); padding: 24px;
         }
-        
-        .panelTop {
-          display: flex;
-          justify-content: space-between;
-          align-items: flex-start;
-          flex-wrap: wrap;
-          gap: 20px;
-          margin-bottom: 24px;
-          border-bottom: 1px solid rgba(255,255,255,0.08);
-          padding-bottom: 20px;
-        }
-        
-        .panelH2 { margin: 0; font-size: 20px; font-weight: 800; }
-        
-        .filtersWrap { flex: 1; display: flex; flex-direction: column; align-items: flex-end; gap: 12px; }
-        @media (max-width: 600px) { .filtersWrap { align-items: flex-start; } }
-
-        .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+        .panelH2 { margin: 0; font-size: 18px; font-weight: 700; color: #fff; }
+        .filtersWrap { margin-top: 16px; }
         .chip {
-          background: transparent;
-          border: 1px solid rgba(255,255,255,0.2);
-          color: rgba(255,255,255,0.7);
-          padding: 6px 14px;
-          border-radius: 20px;
-          font-size: 12px;
-          font-weight: 600;
-          cursor: pointer;
+          background: rgba(255,255,255,0.05); border: none; color: #888;
+          padding: 6px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;
+          transition: 0.2s;
         }
-        .chipActive { background: white; color: black; border-color: white; }
+        .chipActive { background: #fff; color: #000; }
+        
+        .metaInfo { margin: 20px 0; padding: 16px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+        .metaRow { display: flex; font-size: 13px; gap: 10px; color: #ccc; }
+        .metaLabel { opacity: 0.5; width: 50px; }
+        .seeMore { cursor: pointer; opacity: 0.5; font-size: 11px; }
 
-        .qFilters {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          background: rgba(255,255,255,0.05);
-          padding: 6px 12px;
-          border-radius: 12px;
-        }
-        .qTitle { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 700; }
-        .qRow { display: flex; gap: 6px; }
-        .qChip {
-          background: transparent;
-          border: none;
-          color: rgba(255,255,255,0.6);
-          font-size: 11px;
-          font-weight: 700;
-          padding: 4px 8px;
-          border-radius: 6px;
-          cursor: pointer;
-        }
-        .qActive { background: rgba(0, 242, 255, 0.2); color: #00f2ff; }
-
-        .metaInfo {
-          background: rgba(255,255,255,0.03);
-          border-radius: 12px;
-          padding: 16px;
-          margin-bottom: 24px;
-          display: flex;
-          flex-direction: column;
-          gap: 8px;
-        }
-        .metaRow { display: flex; gap: 12px; font-size: 14px; }
-        .metaLabel { width: 60px; color: rgba(255,255,255,0.4); }
-        .metaValue { flex: 1; color: rgba(255,255,255,0.9); font-weight: 500; }
-        .link { color: #00f2ff; text-decoration: none; }
-        .seeMore { color: #aaa; cursor: pointer; font-size: 12px; margin-left: 6px; }
-
-        /* LIST ITEMS */
         .list { display: flex; flex-direction: column; gap: 12px; }
         .item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 16px;
-          background: rgba(0,0,0,0.2);
-          border: 1px solid rgba(255,255,255,0.05);
-          padding: 16px;
-          border-radius: 16px;
-          flex-wrap: wrap;
+          display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;
+          background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);
+          padding: 16px; border-radius: 12px;
         }
-        .left { flex: 1; min-width: 200px; }
-        .typeRow { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+        .typeTag { font-size: 9px; font-weight: 800; background: #333; color: #fff; padding: 3px 6px; border-radius: 4px; text-transform: uppercase; margin-right: 8px; }
+        .qualityTag { font-size: 11px; color: #888; }
+        .urlPreview { font-family: monospace; font-size: 11px; color: #555; margin-top: 4px; }
         
-        .typeTag {
-          font-size: 10px; font-weight: 900; text-transform: uppercase;
-          padding: 4px 8px; border-radius: 6px; background: #333; color: #fff;
+        .btnPri, .btnSec {
+          padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 600; text-decoration: none; cursor: pointer;
         }
-        .typeTag.video { background: #E1306C; }
-        .typeTag.image { background: #5851DB; }
-        .typeTag.audio { background: #1DB954; }
-        
-        .qualityTag { font-size: 11px; color: rgba(255,255,255,0.7); }
-        .urlPreview { font-size: 12px; color: rgba(255,255,255,0.4); font-family: monospace; }
-        
-        .actions { display: flex; gap: 10px; }
-        .btnSec, .btnPri {
-          padding: 10px 16px;
-          border-radius: 10px;
-          font-weight: 700;
-          font-size: 13px;
-          cursor: pointer;
-          text-decoration: none;
-          text-align: center;
-        }
-        .btnSec {
-          background: rgba(255,255,255,0.08);
-          color: white;
-          border: none;
-        }
-        .btnPri {
-          background: white;
-          color: black;
-          border: none;
-        }
-        .emptyState { text-align: center; padding: 20px; color: rgba(255,255,255,0.4); font-size: 14px; }
+        .btnSec { background: rgba(255,255,255,0.05); color: #ccc; border: none; }
+        .btnPri { background: #fff; color: #000; margin-left: 8px; }
 
         /* FOOTER */
-        .footer {
-          margin-top: auto;
-          padding: 40px 20px 20px;
-          text-align: center;
-        }
-        .footerLine { height: 1px; background: rgba(255,255,255,0.1); width: 100%; max-width: 200px; margin: 0 auto 20px; }
-        .footer p { font-size: 12px; color: rgba(255,255,255,0.4); margin: 0; }
+        .footer { padding: 40px 0 20px; text-align: center; }
+        .footer p { font-size: 11px; color: rgba(255,255,255,0.2); }
 
         /* MODAL */
         .modalBackdrop {
-          position: fixed; inset: 0;
-          background: rgba(0,0,0,0.85);
-          backdrop-filter: blur(5px);
-          display: flex; align-items: center; justify-content: center;
-          z-index: 100;
-          padding: 20px;
+          position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+          backdrop-filter: blur(10px); z-index: 100;
+          display: flex; align-items: center; justify-content: center; padding: 20px;
         }
         .modal {
-          width: min(700px, 100%);
-          background: #111;
-          border: 1px solid rgba(255,255,255,0.15);
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+          width: min(600px, 100%); background: #111; border: 1px solid #333;
+          border-radius: 16px; overflow: hidden;
         }
-        .modalHeader {
-          padding: 16px 20px;
-          border-bottom: 1px solid rgba(255,255,255,0.1);
-          display: flex; justify-content: space-between; align-items: center;
-        }
-        .modalHTitle { font-weight: 700; font-size: 16px; }
-        .modalClose { background: none; border: none; color: white; font-size: 20px; cursor: pointer; }
-        .modalContent {
-          padding: 20px;
-          display: flex; justify-content: center;
-          background: #000;
-        }
-        .modalMedia { max-width: 100%; max-height: 60vh; border-radius: 8px; }
-        .modalAudio { width: 100%; }
-        .modalFooter {
-          padding: 16px 20px;
-          border-top: 1px solid rgba(255,255,255,0.1);
-          display: flex; justify-content: flex-end;
-          background: #151515;
-        }
-        .modalBtnDownload {
-          background: #00f2ff;
-          color: #000;
-          padding: 10px 20px;
-          border-radius: 8px;
-          font-weight: 800;
-          text-decoration: none;
-          font-size: 14px;
-        }
+        .modalHeader { padding: 16px; border-bottom: 1px solid #222; display: flex; justify-content: space-between; }
+        .modalClose { background: none; border: none; color: #fff; cursor: pointer; }
+        .modalContent { padding: 20px; display: flex; justify-content: center; background: #000; }
+        .modalMedia { max-width: 100%; max-height: 50vh; border-radius: 8px; }
+        .modalFooter { padding: 16px; border-top: 1px solid #222; display: flex; justify-content: flex-end; }
+        .modalBtnDownload { background: #fff; color: #000; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-size: 13px; font-weight: 700; }
         
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
         .slideUp { animation: slideUp 0.4s ease-out forwards; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
       `}</style>
     </div>
   );
