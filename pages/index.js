@@ -1,4 +1,4 @@
- // pages/index.js
+// pages/index.js
 import { useEffect, useMemo, useState } from "react";
 
 // --- KONFIGURASI & LOGIKA (TIDAK BERUBAH) ---
@@ -6,10 +6,11 @@ import { useEffect, useMemo, useState } from "react";
 const WA_CHANNEL_URL = "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
 const WA_CHANNEL_NAME = "✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧";
 const DEV_NAME = "R_hmt ofc";
+const LOGO_URL = "https://a.top4top.io/p_36880pr920.jpeg"; // URL Logo/Background
 
 const PLATFORM_BG = {
   default:
-    "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&w=1600&q=80", // Abstract Dark
+    "https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?auto=format&fit=crop&w=1600&q=80",
   tiktok:
     "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1600&q=80",
   instagram:
@@ -18,7 +19,7 @@ const PLATFORM_BG = {
     "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=1600&q=80",
   facebook:
     "https://images.unsplash.com/photo-1611162618071-b39a2ec05542?auto=format&fit=crop&w=1600&q=80",
-  x: "https://images.unsplash.com/photo-1611605698383-ee9845280d39?auto=format&fit=crop&w=1600&q=80", // Twitter/X abstract
+  x: "https://images.unsplash.com/photo-1611605698383-ee9845280d39?auto=format&fit=crop&w=1600&q=80",
   threads:
     "https://images.unsplash.com/photo-1690322615367-27b0033c5634?auto=format&fit=crop&w=1600&q=80",
   pinterest:
@@ -85,15 +86,14 @@ function qualityTagKey(q = "") {
   return "other";
 }
 
-// Icon WhatsApp SVG
+// Icon WhatsApp SVG (Fixed)
 const WhatsAppIcon = () => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     viewBox="0 0 24 24"
     width="32"
     height="32"
-    fill="currentColor"
-    className="waIcon"
+    fill="#fff"
   >
     <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.696c1.005.54 1.961.884 2.806.884 3.182 0 5.769-2.586 5.769-5.766.001-3.18-2.584-5.767-5.769-5.767zm.992 9.079c-1.745.975-2.859.39-3.078.17-.674-.675-1.928-2.316-1.523-3.692.174-.593.593-.846.858-.888.312-.05.513-.03.626.241.135.324.457 1.106.505 1.196.068.128.02.32-.132.502-.134.16-.184.22-.303.366-.129.158-.291.24-.132.52.164.29.728 1.189 1.564 1.934 1.057.94 1.84 1.137 2.193 1.026.19-.06.772-.821.892-1.053.13-.252.193-.201.442-.086.249.115 1.583.749 1.708.811.125.062.208.093.24.156.031.062.067 1.157-.597 1.638-.597.432-1.393.188-1.393.188zM12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm0 22c-5.523 0-10-4.477-10-10S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
   </svg>
@@ -243,8 +243,16 @@ export default function Home() {
     <div className="page">
       {/* HEADER UTAMA */}
       <header className="header">
-        <div className="brandName">{DEV_NAME}</div>
-        <div className="brandTag">Dev Tools</div>
+        {/* KIRI: LOGO GAMBAR */}
+        <div className="brandLeft">
+          <img src={LOGO_URL} alt="Logo" className="brandLogo" />
+        </div>
+        
+        {/* KANAN: SYSTEM STATUS */}
+        <div className="systemStatus">
+          <div className="statusDot" />
+          <span className="statusText">System On</span>
+        </div>
       </header>
 
       {/* HERO SECTION BESAR (Welcome Area) */}
@@ -262,7 +270,7 @@ export default function Home() {
             </p>
           </div>
 
-          {/* INPUT CARD SEKARANG DISINI */}
+          {/* INPUT CARD */}
           <div className="inputCard glass">
             <div className="inputLabel">
               Platform detected: <span className="platformBadge">{platform === 'default' ? 'Auto Detect' : platform.toUpperCase()}</span>
@@ -386,39 +394,48 @@ export default function Home() {
       {/* INFO CARDS (Tampil jika belum ada data) */}
       {!data && (
         <section className="contentSection">
-          {/* JOIN WHATSAPP CARD - REVISED */}
-          <div className="waCard">
-            <div className="waIconBox">
-              <WhatsAppIcon />
-            </div>
-            <div className="waContent">
-              <div className="waLabel">Join Official Channel</div>
-              <div className="waChannelName">{WA_CHANNEL_NAME}</div>
-              <div className="waDevName">By: {DEV_NAME}</div>
-              <div className="waDesc">
-                Dapatkan info update fitur terbaru, perbaikan bug, dan tools menarik lainnya langsung dari developer.
-              </div>
-            </div>
-            <a className="waBtn" href={WA_CHANNEL_URL} target="_blank" rel="noreferrer">
-              Gabung Sekarang
-            </a>
-          </div>
-
+          {/* FEATURE GRID TERLEBIH DAHULU */}
           <div className="featureGrid">
             <div className="featureCard">
               <div className="fIcon">⚡</div>
               <div className="fTitle">Super Cepat</div>
-              <div className="fDesc">Proses scraping data yang dioptimalkan untuk kecepatan maksimal.</div>
+              <div className="fDesc">Teknologi scraping cerdas yang dioptimalkan untuk kecepatan tanpa jeda.</div>
             </div>
             <div className="featureCard">
               <div className="fIcon">🔒</div>
               <div className="fTitle">Aman & Privat</div>
-              <div className="fDesc">Kami tidak menyimpan log history download Anda. Privacy first.</div>
+              <div className="fDesc">Enkripsi End-to-End, tanpa log history. Privasi Anda adalah prioritas kami.</div>
             </div>
             <div className="featureCard">
               <div className="fIcon">💎</div>
-              <div className="fTitle">High Quality</div>
-              <div className="fDesc">Mendukung resolusi HD, 4K, hingga Audio 320kbps jika tersedia.</div>
+              <div className="fTitle">Kualitas Asli</div>
+              <div className="fDesc">Unduh media dengan resolusi tertinggi (4K/HD) tanpa kompresi tambahan.</div>
+            </div>
+          </div>
+
+          {/* JOIN WHATSAPP CARD - DI BAWAH FEATURE GRID */}
+          <div className="waCardWrapper">
+            <div className="waCard">
+                <div className="waOverlay"></div>
+                <div className="waContentInner">
+                    <div className="waHeader">
+                        <div className="waIconBox">
+                        <WhatsAppIcon />
+                        </div>
+                        <div className="waMeta">
+                            <span className="waTag">OFFICIAL CHANNEL</span>
+                            <h3 className="waTitle">{WA_CHANNEL_NAME}</h3>
+                        </div>
+                    </div>
+                    
+                    <p className="waDesc">
+                        Dapatkan info update fitur terbaru, perbaikan bug, dan tools menarik lainnya langsung dari developer.
+                    </p>
+                    
+                    <a className="waBtn" href={WA_CHANNEL_URL} target="_blank" rel="noreferrer">
+                        Gabung Channel
+                    </a>
+                </div>
             </div>
           </div>
         </section>
@@ -470,7 +487,6 @@ export default function Home() {
         }
         * { box-sizing: border-box; }
         
-        /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #0b0f19; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -497,20 +513,51 @@ export default function Home() {
           align-items: center;
           z-index: 50;
         }
-        .brandName {
-          font-weight: 800;
-          font-size: 18px;
-          letter-spacing: -0.5px;
-          color: rgba(255,255,255,0.9);
+        
+        .brandLogo {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease;
         }
-        .brandTag {
-          font-size: 11px;
-          font-weight: 700;
-          background: rgba(255,255,255,0.1);
-          border: 1px solid rgba(255,255,255,0.1);
-          padding: 4px 10px;
-          border-radius: 20px;
-          color: rgba(255,255,255,0.7);
+        .brandLogo:hover {
+            transform: scale(1.1);
+            border-color: #00f2ff;
+        }
+
+        /* SYSTEM ON STATUS */
+        .systemStatus {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            padding: 6px 14px;
+            border-radius: 20px;
+            backdrop-filter: blur(5px);
+        }
+        .statusDot {
+            width: 8px;
+            height: 8px;
+            background-color: #00ff88;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #00ff88;
+            animation: pulse 2s infinite;
+        }
+        .statusText {
+            font-size: 11px;
+            font-weight: 700;
+            color: #00ff88;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+            70% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 6px rgba(0, 255, 136, 0); }
+            100% { transform: scale(1); opacity: 1; box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
         }
 
         /* HERO MAIN */
@@ -661,88 +708,128 @@ export default function Home() {
           padding: 40px 20px;
         }
 
-        /* WA CARD */
-        .waCard {
-          display: flex;
-          align-items: center;
+        /* FEATURE GRID (PROFESSIONAL LOOK) */
+        .featureGrid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
           gap: 20px;
-          background: linear-gradient(135deg, rgba(37, 211, 102, 0.1), rgba(18, 140, 126, 0.05));
-          border: 1px solid rgba(37, 211, 102, 0.3);
-          border-radius: 20px;
-          padding: 24px;
           margin-bottom: 40px;
         }
-        @media (max-width: 700px) {
-          .waCard { flex-direction: column; text-align: center; }
+        .featureCard {
+          background: linear-gradient(145deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%);
+          border: 1px solid rgba(255,255,255,0.05);
+          padding: 30px 24px;
+          border-radius: 18px;
+          transition: all 0.3s ease;
+          position: relative;
+          overflow: hidden;
+        }
+        .featureCard:hover { 
+            background: linear-gradient(145deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border-color: rgba(0, 242, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .fIcon { font-size: 28px; margin-bottom: 16px; }
+        .fTitle { font-weight: 800; font-size: 17px; margin-bottom: 10px; color: #fff; }
+        .fDesc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.6; }
+
+        /* WA CARD WRAPPER */
+        .waCardWrapper {
+            margin-top: 20px;
+        }
+
+        /* WA CARD CUSTOM BG */
+        .waCard {
+          position: relative;
+          background-image: url('${LOGO_URL}');
+          background-size: cover;
+          background-position: center;
+          border-radius: 24px;
+          overflow: hidden;
+          box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+          border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .waOverlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 100%);
+            z-index: 1;
+        }
+
+        .waContentInner {
+            position: relative;
+            z-index: 2;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .waHeader {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
 
         .waIconBox {
-          width: 60px;
-          height: 60px;
+          width: 56px;
+          height: 56px;
           background: #25D366;
           border-radius: 50%;
           display: flex;
           align-items: center;
           justify-content: center;
-          color: white;
-          flex-shrink: 0;
-          box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+          box-shadow: 0 0 20px rgba(37, 211, 102, 0.4);
         }
-        .waContent { flex: 1; }
-        .waLabel {
-          font-size: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          color: #25D366;
-          font-weight: 700;
-          margin-bottom: 4px;
+        
+        .waMeta { display: flex; flex-direction: column; gap: 4px; }
+        .waTag {
+            font-size: 10px;
+            font-weight: 900;
+            color: #25D366;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
         }
-        .waChannelName {
-          font-size: 18px;
-          font-weight: 800;
-          color: white;
-          margin-bottom: 4px;
+        .waTitle {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
         }
-        .waDevName {
-          font-size: 13px;
-          color: rgba(255,255,255,0.6);
-          margin-bottom: 10px;
-        }
+        
         .waDesc {
-          font-size: 13px;
-          color: rgba(255,255,255,0.7);
-          line-height: 1.5;
+          font-size: 14px;
+          color: rgba(255,255,255,0.8);
+          line-height: 1.6;
+          margin: 0;
+          max-width: 600px;
         }
+        
         .waBtn {
-          display: inline-block;
+          align-self: flex-start;
           background: #25D366;
-          color: #0b141a;
+          color: #000;
           text-decoration: none;
-          padding: 12px 20px;
-          border-radius: 10px;
+          padding: 14px 28px;
+          border-radius: 12px;
           font-weight: 800;
           font-size: 14px;
-          transition: transform 0.2s;
+          transition: transform 0.2s, box-shadow 0.2s;
         }
-        .waBtn:hover { transform: scale(1.05); }
+        .waBtn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 211, 102, 0.3);
+            background: #20bd5a;
+        }
 
-        /* FEATURE GRID */
-        .featureGrid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-          gap: 20px;
+        @media (max-width: 600px) {
+            .waHeader { flex-direction: column; text-align: center; }
+            .waContentInner { align-items: center; text-align: center; }
+            .waBtn { align-self: center; }
         }
-        .featureCard {
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.08);
-          padding: 24px;
-          border-radius: 18px;
-          transition: background 0.2s;
-        }
-        .featureCard:hover { background: rgba(255,255,255,0.06); }
-        .fIcon { font-size: 24px; margin-bottom: 12px; }
-        .fTitle { font-weight: 700; font-size: 16px; margin-bottom: 8px; }
-        .fDesc { font-size: 13px; color: rgba(255,255,255,0.6); line-height: 1.5; }
 
         /* RESULT PANEL */
         .panel {
@@ -924,7 +1011,6 @@ export default function Home() {
           font-size: 14px;
         }
         
-        /* Animations */
         @keyframes slideUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
