@@ -17,20 +17,6 @@ const PLATFORM_BG = {
   spotify: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=1600&q=80",
 };
 
-// --- ICON WHATSAPP (SVG) ---
-const WhatsAppIcon = () => (
-  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M12.031 2C6.508 2 2.009 6.49 2 12.016c0 1.77.463 3.447 1.272 4.908l-1.349 4.925 5.042-1.322c1.436.784 3.076 1.236 4.814 1.236 5.523 0 10.017-4.49 10.017-10.017C21.795 6.49 17.554 2 12.031 2zM12.03 20.25c-1.503 0-2.923-.404-4.167-1.11l-2.92.766.78-2.853a8.17 8.17 0 0 1-1.206-4.288c0-4.52 3.676-8.2 8.2-8.2s8.2 3.676 8.2 8.2c0 4.524-3.676 8.2-8.2 8.2z" 
-      fill="#fff" opacity="0.4"
-    />
-    <path 
-      d="M16.735 14.478c-.26-.13-1.538-.76-1.776-.846-.237-.086-.41-.13-.582.13-.173.258-.67.845-.82.1.02-.152.022-.26-.065-.54-.236-.28-.13-.586-.258-.888-.388-.302-.13-.52-.086-.714.237-.194.323-.043.603.13.948.172.344.757.56 1.83 1.023 2.89.605 1.303 1.055 1.583 1.256 1.052.197.393.593.364.914.344.323-.043 1.538-.649 1.754-1.255.216-.606.216-1.124.152-1.233-.065-.107-.237-.172-.496-.301z" 
-      fill="#fff"
-    />
-  </svg>
-);
-
 // --- LOGIC FUNCTIONS ---
 function detectPlatform(url = "") {
   const u = (url || "").toLowerCase();
@@ -185,7 +171,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* HERO SECTION - REVISI JARAK */}
+      {/* HERO SECTION */}
       <section className="heroMain" style={{ backgroundImage: `url(${bg})` }}>
         <div className="heroOverlay" />
         
@@ -327,8 +313,12 @@ export default function Home() {
                 <div className="waContentInner">
                     <div className="waTop">
                         <div className="waIconCircle">
-                            {/* REVISI: Ganti Image ke SVG Icon WA */}
-                            <WhatsAppIcon />
+                            {/* FIX: MENGGUNAKAN GAMBAR PNG WHATSAPP AGAR PASTI MUNCUL */}
+                            <img 
+                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/WhatsApp.svg/120px-WhatsApp.svg.png" 
+                                alt="WhatsApp" 
+                                style={{ width: '32px', height: '32px', objectFit: 'contain' }} 
+                            />
                         </div>
                         <div className="waMeta">
                             <span className="waTag">OFFICIAL CHANNEL</span>
@@ -425,13 +415,13 @@ export default function Home() {
         .statusText { font-size: 11px; font-weight: 600; color: #00ff9d; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
-        /* HERO REVISI: MIN-HEIGHT DIKURANGI AGAR DEKAT */
+        /* HERO REVISI: JARAK DIKURANGI */
         .heroMain {
           position: relative; 
-          min-height: 60vh; /* Dikurangi dari 85vh agar tidak terlalu jauh */
+          min-height: 60vh; /* Dikurangi biar dekat */
           display: flex; align-items: center; justify-content: center;
           background-size: cover; background-position: center;
-          padding: 100px 20px 40px; /* Padding bawah dikurangi */
+          padding: 100px 20px 40px;
         }
         .heroOverlay {
           position: absolute; inset: 0;
@@ -484,7 +474,7 @@ export default function Home() {
         .errorMsg { text-align: left; color: #ff6b6b; margin-top: 12px; font-size: 13px; padding-left: 4px; }
         .inputFooter { margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
 
-        /* CONTENT: PADDING TOP DIHAPUS BIAR NEMPEL */
+        /* CONTENT: PAD TOP 0 SUPAYA NEMPEL */
         .contentSection { width: min(800px, 100%); margin: 0 auto; padding: 0 20px 60px; }
 
         .featureGrid {
