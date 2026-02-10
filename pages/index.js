@@ -1,69 +1,34 @@
 // pages/index.js
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
-const DEV_NAME = "R_hmt ofc";
-const SITE_NAME = "Downloader Lab";
-const SITE_TAGLINE = "Preview → Download. Semua media selalu punya tombol Preview + Download.";
-const SITE_DESC =
-  "Unduh video, image, dan audio dari berbagai platform. Dibuat ringan, enak di mobile, dan tetap rapi di desktop/DeX.";
-
-const WA_CHANNEL_URL =
+const WA_CHANNEL =
   "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
-const WA_CHANNEL_NAME = "✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧";
 
-const SUPPORTED = [
-  "TikTok",
-  "Instagram",
-  "Facebook",
-  "X",
-  "YouTube",
-  "Threads",
-  "Pinterest",
-  "Snapchat",
-  "Spotify",
-  "SoundCloud",
-];
-
-const PLATFORM_META = [
-  { key: "tiktok", label: "TIKTOK", hint: "watermark/no-watermark/HD biasanya tersedia" },
-  { key: "instagram", label: "INSTAGRAM", hint: "reel / post / story tergantung link" },
-  { key: "facebook", label: "FACEBOOK", hint: "post / share / watch tergantung link" },
-  { key: "youtube", label: "YOUTUBE", hint: "kadang protected/expiring (bukan UI)" },
-  { key: "x", label: "X", hint: "video / image (tergantung tweet)" },
-  { key: "threads", label: "THREADS", hint: "media tergantung post" },
-  { key: "pinterest", label: "PINTEREST", hint: "image / video tergantung pin" },
-  { key: "snapchat", label: "SNAPCHAT", hint: "media tergantung link" },
-  { key: "spotify", label: "SPOTIFY", hint: "biasanya audio/preview (tergantung sumber)" },
-  { key: "soundcloud", label: "SOUNDCLOUD", hint: "audio tergantung track" },
-];
-
-const BG_BY_PLATFORM = {
+const PLATFORM_BG = {
   default:
-    "radial-gradient(900px 420px at 20% 15%, rgba(124, 58, 237, .26), transparent 55%), radial-gradient(900px 420px at 80% 5%, rgba(34, 211, 238, .20), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(244, 114, 182, .14), transparent 55%)",
+    "https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=1600&q=80",
   tiktok:
-    "radial-gradient(900px 420px at 22% 12%, rgba(34, 211, 238, .22), transparent 55%), radial-gradient(900px 420px at 75% 10%, rgba(244, 114, 182, .18), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .18), transparent 55%)",
+    "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1600&q=80",
   instagram:
-    "radial-gradient(900px 420px at 22% 12%, rgba(244, 114, 182, .24), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(249, 115, 22, .18), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .16), transparent 55%)",
+    "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=1600&q=80",
   youtube:
-    "radial-gradient(900px 420px at 22% 12%, rgba(239, 68, 68, .22), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .14), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .14), transparent 55%)",
+    "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=1600&q=80",
   facebook:
-    "radial-gradient(900px 420px at 22% 12%, rgba(59, 130, 246, .20), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .14), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .14), transparent 55%)",
-  x:
-    "radial-gradient(900px 420px at 22% 12%, rgba(148, 163, 184, .18), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .12), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1611162618071-b39a2ec05542?auto=format&fit=crop&w=1600&q=80",
+  x: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1600&q=80",
   threads:
-    "radial-gradient(900px 420px at 22% 12%, rgba(148, 163, 184, .18), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(244, 114, 182, .12), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1600&q=80",
   pinterest:
-    "radial-gradient(900px 420px at 22% 12%, rgba(239, 68, 68, .20), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .12), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=1600&q=80",
   snapchat:
-    "radial-gradient(900px 420px at 22% 12%, rgba(250, 204, 21, .18), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .12), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=1600&q=80",
   spotify:
-    "radial-gradient(900px 420px at 22% 12%, rgba(34, 197, 94, .16), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .10), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=1600&q=80",
   soundcloud:
-    "radial-gradient(900px 420px at 22% 12%, rgba(249, 115, 22, .18), transparent 55%), radial-gradient(900px 420px at 78% 12%, rgba(34, 211, 238, .10), transparent 55%), radial-gradient(900px 420px at 55% 100%, rgba(124, 58, 237, .12), transparent 55%)",
+    "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=1600&q=80",
 };
 
-/* ===================== helpers ===================== */
-function detectPlatformKey(url = "") {
+function detectPlatform(url = "") {
   const u = (url || "").toLowerCase();
   if (u.includes("tiktok.com")) return "tiktok";
   if (u.includes("instagram.com")) return "instagram";
@@ -78,29 +43,13 @@ function detectPlatformKey(url = "") {
   return "default";
 }
 
-function platformLabel(key) {
-  if (!key || key === "default") return "UNKNOWN";
-  const item = PLATFORM_META.find((x) => x.key === key);
-  return item?.label || key.toUpperCase();
-}
-
-function platformHint(key) {
-  if (!key || key === "default") return "Tempel link sosial media yang ingin kamu unduh.";
-  const item = PLATFORM_META.find((x) => x.key === key);
-  return item?.hint || "Tempel link sosial media yang ingin kamu unduh.";
-}
-
-function isProbablyUrl(s = "") {
-  return /^https?:\/\//i.test((s || "").trim());
-}
-
 function clampText(text = "", limit = 240) {
   if (!text) return { short: "", isLong: false };
   const isLong = text.length > limit;
   return { short: isLong ? text.slice(0, limit) + "…" : text, isLong };
 }
 
-function shortUrl(url = "", limit = 86) {
+function shortUrl(url = "", limit = 72) {
   if (!url) return "";
   return url.length > limit ? url.slice(0, limit) + "…" : url;
 }
@@ -110,15 +59,14 @@ function safeFilename(str = "") {
     .replace(/[/\\?%*:|"<>]/g, "-")
     .replace(/\s+/g, " ")
     .trim()
-    .slice(0, 90);
+    .slice(0, 80);
 }
 
 function normalizeQuality(q = "") {
   const s = (q || "").toLowerCase();
   if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
     return "HD • No Watermark";
-  if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark"))
-    return "No Watermark";
+  if (s.includes("no_watermark") || s.includes("nowatermark")) return "No Watermark";
   if (s.includes("watermark")) return "Watermark";
   if (s.includes("hd")) return "HD";
   return q || "";
@@ -126,92 +74,70 @@ function normalizeQuality(q = "") {
 
 function qualityTagKey(q = "") {
   const s = (q || "").toLowerCase();
-  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark"))) return "hd_nw";
-  if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark")) return "nw";
+  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
+    return "hd_nw";
+  if (s.includes("no_watermark") || s.includes("nowatermark")) return "nw";
   if (s.includes("watermark")) return "wm";
   if (s.includes("hd")) return "hd";
   return "other";
 }
 
-function humanType(t = "") {
-  if (t === "video") return "VIDEO";
-  if (t === "image") return "IMAGE";
-  if (t === "audio") return "AUDIO";
-  return "ALL";
-}
-
-/* ===================== main ===================== */
 export default function Home() {
   const [url, setUrl] = useState("");
   const [platform, setPlatform] = useState("default");
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // expected shape: { title, source, medias:[{type,url,quality?}] }
   const [data, setData] = useState(null);
-
-  // UI states
-  const [typeFilter, setTypeFilter] = useState("all"); // all|video|image|audio
-  const [qualityFilter, setQualityFilter] = useState("all"); // all|hd_nw|nw|hd|wm|other
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [qualityFilter, setQualityFilter] = useState("all");
   const [showFullTitle, setShowFullTitle] = useState(false);
 
-  // preview modal
   const [previewOpen, setPreviewOpen] = useState(false);
   const [previewItem, setPreviewItem] = useState(null);
 
-  const inputRef = useRef(null);
-
   useEffect(() => {
-    setPlatform(detectPlatformKey(url));
+    setPlatform(detectPlatform(url));
   }, [url]);
 
-  const bg = BG_BY_PLATFORM[platform] || BG_BY_PLATFORM.default;
+  const bg = PLATFORM_BG[platform] || PLATFORM_BG.default;
 
   const title = data?.title || "";
   const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
 
-  const totalCounts = useMemo(() => {
-    const list = data?.medias || [];
-    const c = { all: list.length, video: 0, image: 0, audio: 0 };
-    for (const m of list) if (m?.type && c[m.type] !== undefined) c[m.type]++;
-    return c;
-  }, [data]);
-
   const qualityOptions = useMemo(() => {
     const medias = data?.medias || [];
-    const vids = medias.filter((m) => m?.type === "video");
+    const vids = medias.filter((m) => m.type === "video");
     const set = new Map();
+
     for (const v of vids) {
-      const raw = v?.quality || "";
+      const raw = v.quality || "";
       const key = qualityTagKey(raw);
       const label = normalizeQuality(raw) || "Other";
       if (key === "other" && !raw) continue;
       if (!set.has(key)) set.set(key, label);
     }
+
     const order = ["hd_nw", "nw", "hd", "wm", "other"];
     const arr = [{ key: "all", label: "All Quality" }];
-    for (const k of order) if (set.has(k)) arr.push({ key: k, label: set.get(k) });
+    for (const k of order) {
+      if (set.has(k)) arr.push({ key: k, label: set.get(k) });
+    }
     return arr;
   }, [data]);
 
   useEffect(() => {
-    setTypeFilter("all");
     setQualityFilter("all");
-    setShowFullTitle(false);
-  }, [data?.source]);
+  }, [data?.source, platform]);
 
-  const filteredMedias = useMemo(() => {
-    const list = (data?.medias || [])
-      .filter((m) => m?.url && m?.type)
-      .map((m) => ({
-        ...m,
-        qualityLabel: normalizeQuality(m?.quality || ""),
-        qualityKey: qualityTagKey(m?.quality || ""),
-      }));
+  const medias = useMemo(() => {
+    const list = (data?.medias || []).map((m) => ({
+      ...m,
+      qualityLabel: normalizeQuality(m.quality || ""),
+      qualityKey: qualityTagKey(m.quality || ""),
+    }));
 
     let out = list;
-
     if (typeFilter !== "all") out = out.filter((m) => m.type === typeFilter);
 
     if (qualityFilter !== "all") {
@@ -221,28 +147,15 @@ export default function Home() {
     return out;
   }, [data, typeFilter, qualityFilter]);
 
-  function buildDownloadLink(item) {
-    const name = safeFilename(`${item.type}${item.quality ? "-" + item.quality : ""}`);
-    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(
-      name || "download"
-    )}`;
-  }
-
   async function onSubmit() {
     setError("");
     setData(null);
+    setShowFullTitle(false);
 
-    const u = (url || "").trim();
-    if (!u) {
-      setError("Masukkan URL dulu.");
-      inputRef.current?.focus?.();
-      return;
-    }
-    if (!isProbablyUrl(u)) {
-      setError("URL harus diawali http:// atau https://");
-      inputRef.current?.focus?.();
-      return;
-    }
+    const u = url.trim();
+    if (!u) return setError("Masukkan URL dulu.");
+    if (!/^https?:\/\//i.test(u))
+      return setError("URL harus diawali http:// atau https://");
 
     setLoading(true);
     try {
@@ -257,7 +170,9 @@ export default function Home() {
       try {
         json = JSON.parse(txt);
       } catch {
-        throw new Error("API tidak mengembalikan JSON. Cek /api/download & logs Vercel.");
+        throw new Error(
+          "API tidak mengembalikan JSON. Pastikan API ada di pages/api/download.js"
+        );
       }
 
       if (!res.ok || json?.error) throw new Error(json?.error || "Gagal mengambil media.");
@@ -278,15 +193,15 @@ export default function Home() {
       setData(normalized);
     } catch (e) {
       setError(String(e?.message || e));
-    } finally {
-      setLoading(false);
     }
+    setLoading(false);
   }
 
   function openPreview(item) {
     setPreviewItem(item);
     setPreviewOpen(true);
   }
+
   function closePreview() {
     setPreviewOpen(false);
     setPreviewItem(null);
@@ -295,309 +210,250 @@ export default function Home() {
   useEffect(() => {
     function onKey(e) {
       if (e.key === "Escape") closePreview();
-      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
-        e.preventDefault();
-        inputRef.current?.focus?.();
-      }
-      if (e.key === "Enter" && (document.activeElement === inputRef.current || document.activeElement?.id === "urlInput")) {
-        onSubmit();
-      }
     }
-    window.addEventListener("keydown", onKey);
+    if (previewOpen) window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [url, previewOpen]);
+  }, [previewOpen]);
 
-  const hasData = !!data;
+  function buildDownloadLink(item) {
+    const name = safeFilename(`${item.type}${item.quality ? "-" + item.quality : ""}`);
+    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(
+      name || "download"
+    )}`;
+  }
+
+  const platformLabel = platform === "default" ? "UNKNOWN" : platform.toUpperCase();
 
   return (
-    <div className="page" style={{ backgroundImage: bg }}>
-      {/* Ambient */}
-      <div className="ambient" aria-hidden="true">
-        <div className="glow g1" />
-        <div className="glow g2" />
-        <div className="grain" />
-      </div>
-
-      <main className="shell">
-        {/* LEFT COLUMN */}
-        <aside className="left">
-          <div className="brand">
-            <div className="dot" />
-            <div className="brandText">
-              <div className="dev">{DEV_NAME}</div>
-              <div className="sub">tools • web</div>
-            </div>
-          </div>
-
-          <h1 className="heroTitle">
-            {SITE_NAME} <span className="hi">Social</span>
+    <div className="page">
+      {/* HEADER WEBSITE */}
+      <header className="siteHeader">
+        <div className="headerInner">
+          <h1 className="siteTitle">
+            All In One <span className="highlight">Social Media Downloader</span>
           </h1>
-          <p className="tagline">{SITE_TAGLINE}</p>
+          <p className="siteTagline">
+            Unduh video, audio, dan gambar dari berbagai platform sosial media dengan mudah dan cepat.
+            Cukup paste link, preview, dan download!
+          </p>
+        </div>
+      </header>
 
-          <div className="card soft">
-            <div className="cardTitle">Tentang</div>
-            <div className="cardBody">{SITE_DESC}</div>
+      {/* HERO INPUT SECTION */}
+      <section className="hero" style={{ backgroundImage: `url(${bg})` }}>
+        <div className="heroOverlay" />
 
-            <div className="miniRow">
-              <span className="pill">Preview-first</span>
-              <span className="pill">Download always</span>
-              <span className="pill">DeX friendly</span>
+        <div className="heroInner">
+          <div className="heroTop">
+            <div className="badge">
+              Detected: <b>{platformLabel}</b>
             </div>
           </div>
 
-          <div className="card">
-            <div className="cardTitle">Supported Platform</div>
-            <div className="chipsWrap">
-              {SUPPORTED.map((s) => (
-                <span key={s} className="chip">
-                  {s}
-                </span>
-              ))}
-            </div>
-            <div className="smallNote">
-              Total: <b>{SUPPORTED.length}</b> platform • (Ctrl+K untuk fokus input)
-            </div>
+          <div className="inputRow">
+            <input
+              className="input"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="Paste link TikTok, Instagram, YouTube, Facebook, dll..."
+              inputMode="url"
+            />
+            <button className="btnMain" onClick={onSubmit} disabled={loading}>
+              {loading ? "Loading..." : "Get Media"}
+            </button>
           </div>
 
-          <div className="card wa">
-            <div className="waHead">
-              <div className="waIcon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="22" height="22">
-                  <path
-                    d="M12 2a9.5 9.5 0 0 0-8.22 14.25L3 22l5.92-1.55A9.5 9.5 0 1 0 12 2z"
-                    fill="currentColor"
-                    opacity="0.22"
-                  />
-                  <path
-                    d="M12 3.8a8.2 8.2 0 0 0-7.1 12.3l-.5 3.1 3.1-.8A8.2 8.2 0 1 0 12 3.8z"
-                    fill="currentColor"
-                    opacity="0.18"
-                  />
-                  <path
-                    d="M16.9 13.7c-.2-.1-1.2-.6-1.4-.7-.2-.1-.4-.1-.6.1-.2.2-.7.7-.8.9-.1.1-.3.1-.5 0s-.9-.3-1.7-1.1c-.6-.5-1-1.2-1.1-1.4-.1-.2 0-.4.1-.5l.4-.5c.1-.2.1-.3 0-.5-.1-.1-.6-1.4-.8-1.9-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.2-.9.8-.9 1.9s.9 2.2 1 2.3c.1.2 1.8 2.8 4.4 3.9.6.3 1.1.5 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.2-.5 1.4-1 .2-.5.2-.9.2-1 0-.1-.2-.2-.4-.3z"
-                    fill="currentColor"
-                  />
-                </svg>
+          {error && <div className="error">❌ {error}</div>}
+
+          <div className="hint">
+            Tips: YouTube kadang gagal karena URL media expiring/protected (bukan UI).
+          </div>
+        </div>
+      </section>
+
+      {/* EMPTY STATE SECTION */}
+      {!data && (
+        <>
+          <section className="miniWrap">
+            <div className="howCard">
+              <div className="howItem">
+                <span className="howNum">①</span>
+                <div>
+                  <div className="howTitle">Paste Link</div>
+                  <div className="howDesc">Masukkan link dari platform sosial media favoritmu.</div>
+                </div>
               </div>
-              <div>
-                <div className="waTitle">{WA_CHANNEL_NAME}</div>
-                <div className="waDesc">
-                  Join channel untuk update tools, AI, dan progress project.{" "}
-                  <span className="waDev">
-                    Dev: <b>{DEV_NAME}</b>
+
+              <div className="howItem">
+                <span className="howNum">②</span>
+                <div>
+                  <div className="howTitle">Preview</div>
+                  <div className="howDesc">Cek dulu video / audio / gambar sebelum download.</div>
+                </div>
+              </div>
+
+              <div className="howItem">
+                <span className="howNum">③</span>
+                <div>
+                  <div className="howTitle">Download</div>
+                  <div className="howDesc">Download langsung tanpa ribet.</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="platforms">
+              Supported: TikTok • Instagram • Facebook • X • YouTube • Threads • Pinterest • Snapchat • Spotify • SoundCloud
+            </div>
+          </section>
+
+          {/* JOIN WHATSAPP CARD */}
+          <section className="miniWrap">
+            <div className="joinCard">
+              <div className="joinLeft">
+                <div className="joinTitle">
+                  <span className="waIcon">📱</span> Join WhatsApp Channel
+                </div>
+                <div className="joinDesc">
+                  Dapat update fitur terbaru, tools baru, dan info project dari developer.
+                </div>
+
+                <div className="joinBadges">
+                  <span className="joinTag">Update Tools</span>
+                  <span className="joinTag">Downloader</span>
+                  <span className="joinTag">Dev Journey</span>
+                </div>
+              </div>
+
+              <div className="joinRight">
+                <a className="joinBtn" href={WA_CHANNEL} target="_blank" rel="noreferrer">
+                  <span className="waBtnIcon">💬</span>
+                  Join Channel
+                </a>
+                <div className="joinSmall">
+                  <b>Channel:</b> ✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧<br />
+                  <b>Dev:</b> R_hmt ofc
+                </div>
+              </div>
+            </div>
+          </section>
+
+          {/* FEATURE CARDS */}
+          <section className="miniWrap">
+            <div className="extraGrid">
+              <div className="extraCard">
+                <div className="extraTitle">⚡ Fast Mode</div>
+                <div className="extraDesc">
+                  Sistem otomatis pilih kualitas terbaik jika tersedia.
+                </div>
+              </div>
+
+              <div className="extraCard">
+                <div className="extraTitle">🔒 Safe Download</div>
+                <div className="extraDesc">
+                  Download lewat proxy agar file tidak gagal di browser.
+                </div>
+              </div>
+
+              <div className="extraCard">
+                <div className="extraTitle">🎯 Preview First</div>
+                <div className="extraDesc">
+                  Preview sebelum download supaya gak salah ambil file.
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* RESULT */}
+      {data && (
+        <section className="panel">
+          <div className="panelTop">
+            <h2 className="h2">Result</h2>
+
+            <div className="filtersWrap">
+              <div className="filters">
+                {["all", "video", "image", "audio"].map((t) => (
+                  <button
+                    key={t}
+                    className={typeFilter === t ? "chip chipActive" : "chip"}
+                    onClick={() => setTypeFilter(t)}
+                  >
+                    {t.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+
+              {qualityOptions.length > 1 && (
+                <div className="qFilters">
+                  <div className="qTitle">Quality Filter</div>
+                  <div className="qRow">
+                    {qualityOptions.map((q) => (
+                      <button
+                        key={q.key}
+                        className={qualityFilter === q.key ? "qChip qActive" : "qChip"}
+                        onClick={() => setQualityFilter(q.key)}
+                      >
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="meta">
+            <b>Title:</b>{" "}
+            {title ? (
+              <>
+                {showFullTitle ? title : shortTitle}
+                {titleLong && (
+                  <span className="seeMore" onClick={() => setShowFullTitle((v) => !v)}>
+                    {showFullTitle ? " Sembunyikan" : " Lihat semua"}
                   </span>
-                </div>
-              </div>
-            </div>
-
-            <div className="waActions">
-              <a className="btnWa" href={WA_CHANNEL_URL} target="_blank" rel="noreferrer">
-                Join WhatsApp Channel
-              </a>
-              <div className="waSmall">Official channel</div>
-            </div>
-          </div>
-
-          <div className="foot">
-            © {new Date().getFullYear()} <b>{DEV_NAME}</b> • {SITE_NAME}
-          </div>
-        </aside>
-
-        {/* RIGHT COLUMN */}
-        <section className="right">
-          <div className="panel">
-            <div className="panelTop">
-              <div className="panelTitle">
-                <div className="h">Downloader</div>
-                <div className="subh">
-                  Detected: <span className="det">{platformLabel(platform)}</span> • {platformHint(platform)}
-                </div>
-              </div>
-
-              <div className="stats">
-                <div className="stat">
-                  <div className="k">Items</div>
-                  <div className="v">{hasData ? totalCounts.all : "—"}</div>
-                </div>
-                <div className="stat">
-                  <div className="k">Video</div>
-                  <div className="v">{hasData ? totalCounts.video : "—"}</div>
-                </div>
-                <div className="stat">
-                  <div className="k">Image</div>
-                  <div className="v">{hasData ? totalCounts.image : "—"}</div>
-                </div>
-                <div className="stat">
-                  <div className="k">Audio</div>
-                  <div className="v">{hasData ? totalCounts.audio : "—"}</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="inputWrap">
-              <input
-                id="urlInput"
-                ref={inputRef}
-                className="input"
-                value={url}
-                onChange={(e) => setUrl(e.target.value)}
-                placeholder="Tempel link sosial media di sini…"
-                inputMode="url"
-              />
-              <button className="btnMain" onClick={onSubmit} disabled={loading}>
-                {loading ? "Fetching..." : "Get Media"}
-              </button>
-            </div>
-
-            {error && <div className="error">❌ {error}</div>}
-
-            <div className="tips">
-              <div className="tip">
-                <span className="dotMini" />
-                Semua item akan punya tombol <b>Preview</b> + <b>Download</b> (termasuk foto).
-              </div>
-              <div className="tip">
-                <span className="dotMini" />
-                YouTube kadang gagal karena URL media expiring/protected (bukan UI).
-              </div>
-            </div>
-          </div>
-
-          {/* Result */}
-          <div className={`result ${hasData ? "show" : ""}`}>
-            {!hasData ? (
-              <div className="emptyState">
-                <div className="emptyTitle">Siap download?</div>
-                <div className="emptyText">
-                  Tempel link, klik <b>Get Media</b>, lalu pilih kualitas (kalau ada).
-                </div>
-                <div className="emptyGrid">
-                  <div className="miniCard">
-                    <div className="miniH">① Paste Link</div>
-                    <div className="miniP">Masukkan link video/image/audio.</div>
-                  </div>
-                  <div className="miniCard">
-                    <div className="miniH">② Preview</div>
-                    <div className="miniP">Cek dulu sebelum download.</div>
-                  </div>
-                  <div className="miniCard">
-                    <div className="miniH">③ Download</div>
-                    <div className="miniP">Unduh file lewat proxy.</div>
-                  </div>
-                </div>
-              </div>
+                )}
+              </>
             ) : (
-              <div className="resultInner">
-                <div className="resultTop">
-                  <div>
-                    <div className="rTitle">Result</div>
-                    <div className="rMeta">
-                      Source:{" "}
-                      <a className="link" href={data.source} target="_blank" rel="noreferrer">
-                        {shortUrl(data.source, 110)}
-                      </a>
-                    </div>
-                  </div>
-
-                  <div className="filters">
-                    <div className="filterRow">
-                      {["all", "video", "image", "audio"].map((t) => (
-                        <button
-                          key={t}
-                          className={typeFilter === t ? "fChip active" : "fChip"}
-                          onClick={() => setTypeFilter(t)}
-                          type="button"
-                        >
-                          {humanType(t)}
-                          {hasData && (
-                            <span className="badgeCount">
-                              {t === "all" ? totalCounts.all : totalCounts[t]}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-
-                    {qualityOptions.length > 1 && (
-                      <div className="qualityBox">
-                        <div className="qHead">
-                          <span className="qDot" />
-                          Quality Filter (video)
-                        </div>
-                        <div className="qRow">
-                          {qualityOptions.map((q) => (
-                            <button
-                              key={q.key}
-                              className={qualityFilter === q.key ? "qChip qActive" : "qChip"}
-                              onClick={() => setQualityFilter(q.key)}
-                              type="button"
-                            >
-                              {q.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* title collapse */}
-                <div className="titleBox">
-                  <div className="tLabel">Title</div>
-                  <div className="tText">
-                    {title ? (
-                      <>
-                        {showFullTitle ? title : shortTitle}
-                        {titleLong && (
-                          <button
-                            className="seeMore"
-                            onClick={() => setShowFullTitle((v) => !v)}
-                            type="button"
-                          >
-                            {showFullTitle ? "Sembunyikan" : "Lihat semua"}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <span className="muted">-</span>
-                    )}
-                  </div>
-                </div>
-
-                <div className="list">
-                  {filteredMedias.map((m, i) => (
-                    <div className="item" key={`${m.type}-${i}`}>
-                      <div className="iLeft">
-                        <div className="iType">
-                          <span className={`tag ${m.type}`}>{m.type.toUpperCase()}</span>
-                          {m.qualityLabel ? <span className="qTag">{m.qualityLabel}</span> : null}
-                        </div>
-                        <div className="iUrl">{shortUrl(m.url, 120)}</div>
-                      </div>
-
-                      <div className="iRight">
-                        <button className="btnSmall" onClick={() => openPreview(m)} type="button">
-                          Preview
-                        </button>
-                        <a className="btnSmall green" href={buildDownloadLink(m)}>
-                          Download
-                        </a>
-                      </div>
-                    </div>
-                  ))}
-
-                  {!filteredMedias.length && (
-                    <div className="noItems">Tidak ada media untuk filter ini. Coba ganti filter.</div>
-                  )}
-                </div>
-              </div>
+              "-"
             )}
           </div>
-        </section>
-      </main>
 
-      {/* Preview Modal */}
+          <div className="meta">
+            <b>Source:</b>{" "}
+            <a className="link" href={data.source} target="_blank" rel="noreferrer">
+              {shortUrl(data.source, 90)}
+            </a>
+          </div>
+
+          <div className="list">
+            {medias.map((m, i) => (
+              <div className="item" key={i}>
+                <div className="left">
+                  <div className="typeRow">
+                    <span className="type">{m.type.toUpperCase()}</span>
+                    {m.quality ? <span className="quality">{normalizeQuality(m.quality)}</span> : null}
+                  </div>
+                  <div className="small">{shortUrl(m.url, 70)}</div>
+                </div>
+
+                <div className="actions">
+                  <button className="btn preview" onClick={() => openPreview(m)}>
+                    Preview
+                  </button>
+                  <a className="btn download" href={buildDownloadLink(m)}>
+                    Download
+                  </a>
+                </div>
+              </div>
+            ))}
+
+            {!medias.length && <div className="empty">Tidak ada media untuk filter ini.</div>}
+          </div>
+        </section>
+      )}
+
+      {/* PREVIEW MODAL */}
       {previewOpen && previewItem && (
         <div className="modalBackdrop" onMouseDown={closePreview}>
           <div className="modal" onMouseDown={(e) => e.stopPropagation()}>
@@ -606,7 +462,7 @@ export default function Home() {
                 Preview • {previewItem.type.toUpperCase()}
                 {previewItem.quality ? ` (${normalizeQuality(previewItem.quality)})` : ""}
               </div>
-              <button className="modalClose" onClick={closePreview} type="button">
+              <button className="modalClose" onClick={closePreview}>
                 ✕
               </button>
             </div>
@@ -635,7 +491,11 @@ export default function Home() {
         </div>
       )}
 
-      {/* Global + CSS */}
+      <footer className="footer">
+        © {new Date().getFullYear()} R_hmt ofc • Downloader Lab
+      </footer>
+
+      {/* GLOBAL CSS */}
       <style jsx global>{`
         html,
         body,
@@ -646,633 +506,481 @@ export default function Home() {
           padding: 0;
           background: #060812;
           overflow-x: hidden;
-          -webkit-tap-highlight-color: transparent;
         }
         * {
           box-sizing: border-box;
         }
       `}</style>
 
+      {/* PAGE CSS */}
       <style jsx>{`
         .page {
           min-height: 100vh;
-          color: rgba(255, 255, 255, 0.92);
-          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-          background-color: #070814;
-          background-repeat: no-repeat;
+          width: 100%;
+          background: radial-gradient(1000px 520px at 20% 0%, rgba(155, 92, 255, 0.18), transparent 60%),
+            radial-gradient(1000px 520px at 80% 0%, rgba(55, 245, 255, 0.14), transparent 60%),
+            linear-gradient(180deg, #060812, #0b0f1c);
+          color: rgba(255, 255, 255, 0.9);
+          font-family: Arial, sans-serif;
+          padding-bottom: 42px;
+        }
+
+        /* HEADER */
+        .siteHeader {
+          width: min(1100px, calc(100% - 24px));
+          margin: 24px auto 18px;
+          padding: 24px 20px;
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          text-align: center;
+        }
+
+        .headerInner {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .siteTitle {
+          margin: 0;
+          font-size: clamp(32px, 6vw, 48px);
+          letter-spacing: -1px;
+          line-height: 1.2;
+          color: rgba(255, 255, 255, 0.95);
+        }
+
+        .highlight {
+          background: linear-gradient(90deg, #7b5fff, #2df5ff, #ff4fd8);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+          font-weight: 900;
+        }
+
+        .siteTagline {
+          margin: 12px 0 0;
+          font-size: 14px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.75);
+          max-width: 700px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .hero,
+        .panel,
+        .footer,
+        .miniWrap {
+          width: min(1100px, calc(100% - 24px));
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .hero {
+          margin-top: 14px;
+          border-radius: 18px;
+          min-height: 280px;
           background-size: cover;
+          background-position: center;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.45);
           position: relative;
+          overflow: hidden;
         }
 
-        /* ambient */
-        .ambient {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          z-index: 0;
-        }
-        .glow {
-          position: absolute;
-          border-radius: 999px;
-          filter: blur(90px);
-          opacity: 0.75;
-        }
-        .g1 {
-          width: 560px;
-          height: 560px;
-          left: -220px;
-          top: -240px;
-          background: rgba(124, 58, 237, 0.40);
-        }
-        .g2 {
-          width: 560px;
-          height: 560px;
-          right: -240px;
-          top: -240px;
-          background: rgba(34, 211, 238, 0.26);
-        }
-        .grain {
-          position: absolute;
-          inset: 0;
-          opacity: 0.07;
-          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='.4'/%3E%3C/svg%3E");
-          background-size: 240px 240px;
+        @media (min-width: 1024px) {
+          .hero {
+            min-height: 320px;
+          }
         }
 
-        /* layout */
-        .shell {
+        .heroOverlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.55), rgba(11, 15, 28, 0.95));
+        }
+
+        .heroInner {
           position: relative;
           z-index: 2;
-          width: min(1220px, calc(100% - 24px));
-          margin: 0 auto;
-          padding: 18px 0 28px;
-          display: grid;
-          grid-template-columns: 420px 1fr;
+          padding: 18px;
+          display: flex;
+          flex-direction: column;
           gap: 16px;
-          align-items: start;
         }
 
-        @media (max-width: 980px) {
-          .shell {
+        .heroTop {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .badge {
+          padding: 10px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.16);
+          background: rgba(255, 255, 255, 0.1);
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.85);
+          white-space: nowrap;
+        }
+
+        .inputRow {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.28);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 18px;
+          padding: 12px;
+          backdrop-filter: blur(12px);
+          width: min(720px, 100%);
+        }
+
+        .input {
+          flex: 1;
+          min-width: 220px;
+          padding: 12px 12px;
+          border-radius: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.14);
+          background: rgba(0, 0, 0, 0.35);
+          color: rgba(255, 255, 255, 0.92);
+          outline: none;
+          font-size: 14px;
+        }
+
+        .btnMain {
+          padding: 12px 16px;
+          border-radius: 14px;
+          border: none;
+          cursor: pointer;
+          font-weight: 900;
+          background: rgba(255, 255, 255, 0.92);
+          color: rgba(0, 0, 0, 0.92);
+          font-size: 14px;
+        }
+
+        .btnMain:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .error {
+          font-weight: 800;
+          color: #ff7a7a;
+          font-size: 14px;
+        }
+
+        .hint {
+          color: rgba(255, 255, 255, 0.58);
+          font-size: 12px;
+          line-height: 1.6;
+          margin-top: 2px;
+        }
+
+        .miniWrap {
+          margin-top: 24px;
+        }
+
+        .howCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
+          padding: 14px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+
+        @media (max-width: 800px) {
+          .howCard {
             grid-template-columns: 1fr;
           }
         }
 
-        /* left */
-        .left {
-          position: sticky;
-          top: 12px;
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-        @media (max-width: 980px) {
-          .left {
-            position: static;
-          }
-        }
-
-        .brand {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding: 12px 14px;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.25);
-          backdrop-filter: blur(10px);
-        }
-        .dot {
-          width: 12px;
-          height: 12px;
-          border-radius: 999px;
-          background: linear-gradient(135deg, rgba(34, 211, 238, 1), rgba(124, 58, 237, 1), rgba(244, 114, 182, 1));
-          box-shadow: 0 0 18px rgba(34, 211, 238, 0.20);
-        }
-        .brandText .dev {
-          font-weight: 900;
-          letter-spacing: 0.2px;
-        }
-        .brandText .sub {
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.62);
-        }
-
-        .heroTitle {
-          margin: 2px 0 0;
-          font-size: 38px;
-          line-height: 1.06;
-          letter-spacing: -0.8px;
-          font-weight: 950;
-        }
-        .hi {
-          background: linear-gradient(90deg, rgba(34, 211, 238, 0.98), rgba(124, 58, 237, 0.98), rgba(244, 114, 182, 0.98));
-          -webkit-background-clip: text;
-          background-clip: text;
-          -webkit-text-fill-color: transparent;
-        }
-        .tagline {
-          margin: 0;
-          color: rgba(255, 255, 255, 0.72);
-          line-height: 1.7;
-          font-size: 14px;
-        }
-
-        .card {
-          border-radius: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.24);
-          backdrop-filter: blur(12px);
-          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.28);
-          padding: 14px;
-        }
-        .card.soft {
-          background: rgba(255, 255, 255, 0.05);
-        }
-        .cardTitle {
-          font-weight: 900;
-          letter-spacing: 0.2px;
-          margin-bottom: 8px;
-        }
-        .cardBody {
-          color: rgba(255, 255, 255, 0.72);
-          line-height: 1.7;
-          font-size: 13px;
-        }
-
-        .miniRow {
-          margin-top: 10px;
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-        }
-        .pill {
-          padding: 7px 10px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.06);
-          font-size: 12px;
-          font-weight: 900;
-          color: rgba(255, 255, 255, 0.82);
-        }
-
-        .chipsWrap {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-        .chip {
-          padding: 7px 10px;
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.06);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          color: rgba(255, 255, 255, 0.80);
-          font-size: 12px;
-          font-weight: 800;
-        }
-        .smallNote {
-          margin-top: 10px;
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.60);
-          line-height: 1.6;
-        }
-
-        .wa {
-          border-color: rgba(34, 197, 94, 0.20);
-          background: rgba(34, 197, 94, 0.06);
-        }
-        .waHead {
+        .howItem {
           display: flex;
           gap: 12px;
           align-items: flex-start;
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(0, 0, 0, 0.2);
         }
-        .waIcon {
-          width: 42px;
-          height: 42px;
-          border-radius: 16px;
+
+        .howNum {
+          width: 30px;
+          height: 30px;
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(34, 197, 94, 0.26);
-          background: rgba(34, 197, 94, 0.12);
-          color: rgba(34, 197, 94, 0.95);
-          flex: 0 0 auto;
+          font-weight: 900;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .waTitle {
-          font-weight: 950;
-          font-size: 13px;
-          letter-spacing: 0.2px;
+
+        .howTitle {
+          font-weight: 900;
+          margin-bottom: 4px;
         }
-        .waDesc {
+
+        .howDesc {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.65);
+          line-height: 1.5;
+        }
+
+        .platforms {
+          margin-top: 10px;
+          text-align: center;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Join Card */
+        .joinCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.22);
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .joinTitle {
+          font-weight: 900;
+          font-size: 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .waIcon {
+          font-size: 18px;
+        }
+
+        .joinDesc {
           margin-top: 6px;
-          color: rgba(255, 255, 255, 0.72);
           font-size: 12px;
           line-height: 1.6;
+          color: rgba(255, 255, 255, 0.7);
+          max-width: 60ch;
         }
-        .waDev {
-          color: rgba(255, 255, 255, 0.90);
-        }
-        .waActions {
-          margin-top: 12px;
+
+        .joinBadges {
+          margin-top: 10px;
           display: flex;
-          flex-direction: column;
-          gap: 6px;
+          gap: 8px;
+          flex-wrap: wrap;
         }
-        .btnWa {
-          display: inline-flex;
-          justify-content: center;
-          align-items: center;
-          padding: 12px 12px;
-          border-radius: 14px;
-          font-weight: 950;
-          text-decoration: none;
-          color: rgba(255, 255, 255, 0.95);
-          border: 1px solid rgba(34, 197, 94, 0.28);
-          background: rgba(34, 197, 94, 0.16);
-          transition: transform 120ms ease;
-        }
-        .btnWa:hover {
-          transform: translateY(-1px);
-        }
-        .waSmall {
+
+        .joinTag {
           font-size: 11px;
-          color: rgba(255, 255, 255, 0.60);
+          font-weight: 900;
+          padding: 6px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.06);
+          color: rgba(255, 255, 255, 0.75);
         }
 
-        .foot {
-          margin-top: 2px;
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.55);
-          text-align: center;
-          padding: 6px 0 2px;
-        }
-
-        /* right */
-        .right {
+        .joinRight {
           display: flex;
           flex-direction: column;
+          align-items: flex-end;
+          gap: 8px;
+        }
+
+        .joinBtn {
+          text-decoration: none;
+          padding: 12px 14px;
+          border-radius: 14px;
+          font-weight: 900;
+          border: 1px solid rgba(45, 255, 143, 0.32);
+          background: rgba(45, 255, 143, 0.16);
+          color: rgba(255, 255, 255, 0.95);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 14px;
+        }
+
+        .waBtnIcon {
+          font-size: 16px;
+        }
+
+        .joinSmall {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.6);
+          text-align: right;
+          line-height: 1.4;
+        }
+
+        /* Extra grid */
+        .extraGrid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
           gap: 12px;
         }
 
+        @media (max-width: 900px) {
+          .extraGrid {
+            grid-template-columns: 1fr;
+          }
+          .joinRight {
+            align-items: flex-start;
+          }
+        }
+
+        .extraCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
+          padding: 14px;
+        }
+
+        .extraTitle {
+          font-weight: 900;
+          margin-bottom: 6px;
+        }
+
+        .extraDesc {
+          font-size: 12px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* RESULT PANEL */
         .panel {
-          border-radius: 22px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.26);
-          backdrop-filter: blur(14px);
-          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.30);
+          margin-top: 24px;
           padding: 16px;
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 16px 60px rgba(0, 0, 0, 0.3);
         }
 
         .panelTop {
           display: flex;
           justify-content: space-between;
+          gap: 14px;
           align-items: flex-start;
-          gap: 12px;
           flex-wrap: wrap;
         }
-        .panelTitle .h {
-          font-weight: 950;
-          letter-spacing: -0.3px;
+
+        .h2 {
+          margin: 0;
           font-size: 18px;
-        }
-        .panelTitle .subh {
-          margin-top: 6px;
-          color: rgba(255, 255, 255, 0.66);
-          font-size: 12px;
-          line-height: 1.6;
-        }
-        .det {
-          display: inline-flex;
-          padding: 4px 9px;
-          border-radius: 999px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(255, 255, 255, 0.06);
-          color: rgba(255, 255, 255, 0.90);
           font-weight: 900;
         }
 
-        .stats {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 8px;
-          width: min(360px, 100%);
-        }
-        @media (max-width: 520px) {
-          .stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            width: 100%;
-          }
-        }
-        .stat {
-          border-radius: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(255, 255, 255, 0.05);
-          padding: 10px;
-        }
-        .stat .k {
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.60);
-          font-weight: 800;
-        }
-        .stat .v {
-          margin-top: 3px;
-          font-size: 16px;
-          font-weight: 950;
-        }
-
-        .inputWrap {
-          margin-top: 12px;
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .input {
-          flex: 1;
-          min-width: 240px;
-          padding: 14px 14px;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(0, 0, 0, 0.30);
-          color: rgba(255, 255, 255, 0.92);
-          outline: none;
-          font-size: 14px;
-        }
-        .input::placeholder {
-          color: rgba(255, 255, 255, 0.45);
-        }
-        .btnMain {
-          padding: 14px 16px;
-          border-radius: 16px;
-          border: none;
-          cursor: pointer;
-          font-weight: 950;
-          background: rgba(255, 255, 255, 0.94);
-          color: rgba(0, 0, 0, 0.92);
-          transition: transform 120ms ease, opacity 120ms ease;
-        }
-        .btnMain:hover {
-          transform: translateY(-1px);
-        }
-        .btnMain:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-          transform: none;
-        }
-        .error {
-          margin-top: 10px;
-          font-weight: 900;
-          color: #ff7a7a;
-          line-height: 1.5;
-        }
-
-        .tips {
-          margin-top: 10px;
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 8px;
-        }
-        @media (max-width: 640px) {
-          .tips {
-            grid-template-columns: 1fr;
-          }
-        }
-        .tip {
-          border-radius: 14px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(255, 255, 255, 0.04);
-          padding: 10px;
-          color: rgba(255, 255, 255, 0.68);
-          font-size: 12px;
-          line-height: 1.6;
-          display: flex;
-          gap: 10px;
-          align-items: flex-start;
-        }
-        .dotMini {
-          width: 8px;
-          height: 8px;
-          border-radius: 999px;
-          margin-top: 5px;
-          background: linear-gradient(135deg, rgba(34, 211, 238, 1), rgba(124, 58, 237, 1));
-          flex: 0 0 auto;
-        }
-
-        /* result container */
-        .result {
-          border-radius: 22px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(14px);
-          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22);
-          padding: 16px;
-        }
-
-        .emptyState {
-          padding: 4px 0 0;
-        }
-        .emptyTitle {
-          font-size: 18px;
-          font-weight: 950;
-          letter-spacing: -0.2px;
-        }
-        .emptyText {
-          margin-top: 6px;
-          color: rgba(255, 255, 255, 0.68);
-          line-height: 1.7;
-          font-size: 13px;
-        }
-        .emptyGrid {
-          margin-top: 12px;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 10px;
-        }
-        @media (max-width: 760px) {
-          .emptyGrid {
-            grid-template-columns: 1fr;
-          }
-        }
-        .miniCard {
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.22);
-          padding: 12px;
-        }
-        .miniH {
-          font-weight: 950;
-          margin-bottom: 6px;
-        }
-        .miniP {
-          color: rgba(255, 255, 255, 0.64);
-          font-size: 12px;
-          line-height: 1.6;
-        }
-
-        .resultInner {
+        .filtersWrap {
           display: flex;
           flex-direction: column;
-          gap: 12px;
-        }
-        .resultTop {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          flex-wrap: wrap;
-          align-items: flex-start;
-        }
-        .rTitle {
-          font-size: 18px;
-          font-weight: 950;
-          letter-spacing: -0.2px;
-        }
-        .rMeta {
-          margin-top: 6px;
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.62);
-          line-height: 1.6;
-        }
-        .link {
-          color: rgba(147, 197, 253, 0.95);
-          text-decoration: none;
-          word-break: break-word;
-        }
-        .link:hover {
-          text-decoration: underline;
+          gap: 10px;
+          width: min(760px, 100%);
         }
 
         .filters {
-          width: min(720px, 100%);
           display: flex;
-          flex-direction: column;
           gap: 10px;
-        }
-        .filterRow {
-          display: flex;
           flex-wrap: wrap;
-          gap: 8px;
         }
-        .fChip {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          padding: 10px 12px;
+
+        .chip {
+          padding: 9px 12px;
           border-radius: 999px;
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(0, 0, 0, 0.22);
-          color: rgba(255, 255, 255, 0.78);
+          color: rgba(255, 255, 255, 0.75);
           cursor: pointer;
-          font-weight: 950;
           font-size: 12px;
-          transition: transform 120ms ease;
-        }
-        .fChip:hover {
-          transform: translateY(-1px);
-        }
-        .fChip.active {
-          background: rgba(255, 255, 255, 0.10);
-          border-color: rgba(255, 255, 255, 0.22);
-          color: rgba(255, 255, 255, 0.96);
-        }
-        .badgeCount {
-          display: inline-flex;
-          min-width: 24px;
-          height: 20px;
-          padding: 0 7px;
-          border-radius: 999px;
-          background: rgba(255, 255, 255, 0.08);
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          justify-content: center;
-          align-items: center;
-          font-size: 11px;
-          color: rgba(255, 255, 255, 0.86);
+          font-weight: 800;
         }
 
-        .qualityBox {
+        .chipActive {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.2);
+          color: rgba(255, 255, 255, 0.95);
+        }
+
+        .qFilters {
           border-radius: 16px;
-          border: 1px solid rgba(34, 211, 238, 0.16);
-          background: rgba(34, 211, 238, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(0, 0, 0, 0.22);
           padding: 10px;
         }
-        .qHead {
-          display: flex;
-          align-items: center;
-          gap: 8px;
+
+        .qTitle {
           font-size: 12px;
-          font-weight: 950;
-          color: rgba(255, 255, 255, 0.86);
+          font-weight: 900;
+          color: rgba(255, 255, 255, 0.82);
           margin-bottom: 8px;
         }
-        .qDot {
-          width: 8px;
-          height: 8px;
-          border-radius: 999px;
-          background: rgba(34, 211, 238, 0.95);
-          box-shadow: 0 0 20px rgba(34, 211, 238, 0.22);
-        }
+
         .qRow {
           display: flex;
-          flex-wrap: wrap;
           gap: 8px;
+          flex-wrap: wrap;
         }
+
         .qChip {
           padding: 9px 12px;
           border-radius: 14px;
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(255, 255, 255, 0.06);
-          color: rgba(255, 255, 255, 0.90);
+          color: rgba(255, 255, 255, 0.86);
           cursor: pointer;
-          font-weight: 950;
           font-size: 12px;
-          transition: transform 120ms ease;
-        }
-        .qChip:hover {
-          transform: translateY(-1px);
-        }
-        .qChip.qActive {
-          border-color: rgba(34, 197, 94, 0.28);
-          background: rgba(34, 197, 94, 0.16);
+          font-weight: 900;
         }
 
-        .titleBox {
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.22);
-          padding: 12px;
+        .qActive {
+          border-color: rgba(45, 255, 143, 0.32);
+          background: rgba(45, 255, 143, 0.16);
         }
-        .tLabel {
-          font-size: 12px;
-          color: rgba(255, 255, 255, 0.62);
-          font-weight: 900;
-          margin-bottom: 6px;
+
+        .meta {
+          margin-top: 10px;
+          color: rgba(255, 255, 255, 0.82);
+          line-height: 1.6;
+          font-size: 14px;
         }
-        .tText {
-          line-height: 1.7;
-          color: rgba(255, 255, 255, 0.86);
-          font-size: 13px;
-        }
+
         .seeMore {
-          margin-left: 10px;
-          border: none;
-          background: transparent;
-          color: rgba(147, 197, 253, 0.95);
-          font-weight: 950;
+          color: rgba(96, 165, 250, 0.95);
           cursor: pointer;
-          padding: 0;
+          font-weight: 900;
         }
-        .muted {
-          color: rgba(255, 255, 255, 0.55);
+
+        .link {
+          color: rgba(147, 197, 253, 0.95);
+          text-decoration: none;
+          word-break: break-word;
+        }
+
+        .link:hover {
+          text-decoration: underline;
         }
 
         .list {
+          margin-top: 14px;
           display: flex;
           flex-direction: column;
           gap: 10px;
         }
+
         .item {
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
-          background: rgba(0, 0, 0, 0.20);
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.22);
           padding: 12px;
           display: flex;
           justify-content: space-between;
@@ -1280,91 +988,82 @@ export default function Home() {
           flex-wrap: wrap;
           align-items: center;
         }
-        .iLeft {
+
+        .left {
           flex: 1;
-          min-width: 260px;
+          min-width: 250px;
         }
-        .iType {
+
+        .typeRow {
           display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
+          gap: 10px;
           align-items: center;
+          flex-wrap: wrap;
         }
-        .tag {
-          padding: 6px 10px;
-          border-radius: 999px;
-          font-weight: 950;
+
+        .type {
+          font-weight: 900;
+          font-size: 14px;
+        }
+
+        .quality {
           font-size: 12px;
+          color: rgba(255, 255, 255, 0.7);
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(255, 255, 255, 0.06);
-        }
-        .tag.video {
-          border-color: rgba(34, 211, 238, 0.20);
-          background: rgba(34, 211, 238, 0.08);
-        }
-        .tag.image {
-          border-color: rgba(244, 114, 182, 0.20);
-          background: rgba(244, 114, 182, 0.08);
-        }
-        .tag.audio {
-          border-color: rgba(34, 197, 94, 0.20);
-          background: rgba(34, 197, 94, 0.08);
-        }
-        .qTag {
-          padding: 6px 10px;
+          padding: 4px 8px;
           border-radius: 999px;
-          font-size: 12px;
-          font-weight: 900;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          background: rgba(255, 255, 255, 0.05);
-          color: rgba(255, 255, 255, 0.78);
         }
-        .iUrl {
-          margin-top: 6px;
+
+        .small {
+          margin-top: 4px;
           font-size: 12px;
-          color: rgba(255, 255, 255, 0.62);
+          color: rgba(255, 255, 255, 0.55);
           word-break: break-word;
-          line-height: 1.6;
         }
-        .iRight {
+
+        .actions {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
         }
-        .btnSmall {
-          padding: 10px 12px;
+
+        .btn {
+          padding: 10px 14px;
           border-radius: 14px;
+          font-weight: 900;
+          font-size: 13px;
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(255, 255, 255, 0.06);
           color: rgba(255, 255, 255, 0.92);
-          font-weight: 950;
-          font-size: 13px;
           cursor: pointer;
           text-decoration: none;
-          transition: transform 120ms ease;
           display: inline-flex;
           align-items: center;
           justify-content: center;
         }
-        .btnSmall:hover {
-          transform: translateY(-1px);
-        }
-        .btnSmall.green {
-          border-color: rgba(34, 197, 94, 0.26);
-          background: rgba(34, 197, 94, 0.16);
+
+        .btn.download {
+          border-color: rgba(45, 255, 143, 0.32);
+          background: rgba(45, 255, 143, 0.16);
         }
 
-        .noItems {
-          border-radius: 14px;
-          padding: 12px;
-          border: 1px dashed rgba(255, 255, 255, 0.16);
-          color: rgba(255, 255, 255, 0.62);
-          background: rgba(0, 0, 0, 0.16);
-          line-height: 1.6;
-          font-size: 13px;
+        .empty {
+          margin-top: 6px;
+          color: rgba(255, 255, 255, 0.6);
+          text-align: center;
+          padding: 20px;
         }
 
-        /* modal */
+        .footer {
+          margin-top: 32px;
+          padding: 10px 0 0;
+          color: rgba(255, 255, 255, 0.55);
+          font-size: 12px;
+          text-align: center;
+        }
+
+        /* MODAL */
         .modalBackdrop {
           position: fixed;
           inset: 0;
@@ -1375,61 +1074,69 @@ export default function Home() {
           padding: 16px;
           z-index: 200;
         }
+
         .modal {
-          width: min(980px, 100%);
-          border-radius: 20px;
+          width: min(900px, 100%);
+          border-radius: 18px;
           border: 1px solid rgba(255, 255, 255, 0.14);
-          background: rgba(10, 12, 20, 0.84);
+          background: rgba(10, 12, 20, 0.82);
           backdrop-filter: blur(18px);
-          box-shadow: 0 22px 90px rgba(0, 0, 0, 0.60);
+          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.55);
           overflow: hidden;
         }
+
         .modalTop {
           display: flex;
           justify-content: space-between;
           gap: 10px;
           align-items: center;
-          padding: 12px 14px;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+          padding: 12px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .modalTitle {
-          font-weight: 950;
-          color: rgba(255, 255, 255, 0.92);
-          font-size: 13px;
+          font-weight: 900;
+          color: rgba(255, 255, 255, 0.9);
         }
+
         .modalClose {
-          width: 38px;
-          height: 38px;
-          border-radius: 14px;
+          width: 36px;
+          height: 36px;
+          border-radius: 12px;
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(255, 255, 255, 0.06);
           color: rgba(255, 255, 255, 0.9);
           cursor: pointer;
         }
+
         .modalBody {
-          padding: 14px;
+          padding: 12px;
           display: flex;
           justify-content: center;
         }
+
         .modalMedia {
           width: 100%;
-          max-height: 74vh;
+          max-height: 72vh;
           object-fit: contain;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.10);
+          border-radius: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
           background: rgba(0, 0, 0, 0.25);
         }
+
         .modalAudio {
           width: 100%;
         }
+
         .modalActions {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
           justify-content: flex-end;
-          padding: 12px 14px;
-          border-top: 1px solid rgba(255, 255, 255, 0.10);
+          padding: 12px;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
+
         .modalBtn {
           text-decoration: none;
           padding: 10px 12px;
@@ -1437,16 +1144,17 @@ export default function Home() {
           border: 1px solid rgba(255, 255, 255, 0.14);
           background: rgba(255, 255, 255, 0.06);
           color: rgba(255, 255, 255, 0.88);
-          font-weight: 950;
+          font-weight: 900;
         }
+
         .modalBtnPrimary {
           text-decoration: none;
           padding: 10px 12px;
           border-radius: 14px;
-          border: 1px solid rgba(34, 197, 94, 0.26);
-          background: rgba(34, 197, 94, 0.16);
+          border: 1px solid rgba(45, 255, 143, 0.32);
+          background: rgba(45, 255, 143, 0.16);
           color: rgba(255, 255, 255, 0.96);
-          font-weight: 950;
+          font-weight: 900;
         }
       `}</style>
     </div>
