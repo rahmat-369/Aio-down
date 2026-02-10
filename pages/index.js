@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 const WA_CHANNEL_URL = "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
 const WA_CHANNEL_NAME = "✧･ﾟ: [𝙍]𝙝𝙢𝙏 | 𝘾𝙤𝙙𝙚⚙️𝘼𝙄 𝙡 :･ﾟ✧";
 const DEV_NAME = "R_hmt ofc";
-const LOGO_URL = "https://a.top4top.io/p_36880pr920.jpeg";
+const LOGO_URL = "https://a.top4top.io/p_36880pr920.jpeg"; // Foto Profil & BG
 
 const PLATFORM_BG = {
   default:
@@ -67,20 +67,6 @@ function qualityTagKey(q = "") {
   if (s.includes("hd")) return "hd";
   return "other";
 }
-
-// Icon WhatsApp SVG (High Visibility)
-const WhatsAppIcon = () => (
-  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path 
-      d="M12.031 2C6.508 2 2.009 6.49 2 12.016c0 1.77.463 3.447 1.272 4.908l-1.349 4.925 5.042-1.322c1.436.784 3.076 1.236 4.814 1.236 5.523 0 10.017-4.49 10.017-10.017C21.795 6.49 17.554 2 12.031 2zM12.03 20.25c-1.503 0-2.923-.404-4.167-1.11l-2.92.766.78-2.853a8.17 8.17 0 0 1-1.206-4.288c0-4.52 3.676-8.2 8.2-8.2s8.2 3.676 8.2 8.2c0 4.524-3.676 8.2-8.2 8.2z" 
-      fill="#fff" opacity="0.4"
-    />
-    <path 
-      d="M16.735 14.478c-.26-.13-1.538-.76-1.776-.846-.237-.086-.41-.13-.582.13-.173.258-.67.845-.82.1.02-.152.022-.26-.065-.54-.236-.28-.13-.586-.258-.888-.388-.302-.13-.52-.086-.714.237-.194.323-.043.603.13.948.172.344.757.56 1.83 1.023 2.89.605 1.303 1.055 1.583 1.256 1.052.197.393.593.364.914.344.323-.021 1.538-.627 1.754-1.233.216-.606.216-1.124.152-1.233-.065-.107-.237-.172-.496-.301z" 
-      fill="#fff"
-    />
-  </svg>
-);
 
 export default function Home() {
   const [url, setUrl] = useState("");
@@ -314,7 +300,6 @@ export default function Home() {
       {!data && (
         <section className="contentSection">
           
-          {/* FEATURE GRID TERBARU */}
           <div className="featureGrid">
             <div className="featureCard">
               <div className="fIconBox">⚡</div>
@@ -339,16 +324,18 @@ export default function Home() {
             </div>
           </div>
 
-          {/* WHATSAPP CARD TERBARU */}
+          {/* WHATSAPP CARD TERBARU - REVISI */}
           <div className="waCardWrapper">
             <div className="waCard">
+                {/* Background tanpa blur */}
                 <div className="waBgImage" style={{backgroundImage: `url(${LOGO_URL})`}}></div>
                 <div className="waOverlay"></div>
                 
                 <div className="waContentInner">
                     <div className="waTop">
                         <div className="waIconCircle">
-                            <WhatsAppIcon />
+                            {/* Icon diganti Foto */}
+                            <img src={LOGO_URL} alt="WA Icon" className="waIconImg" />
                         </div>
                         <div className="waMeta">
                             <span className="waTag">OFFICIAL CHANNEL</span>
@@ -399,7 +386,7 @@ export default function Home() {
       <style jsx global>{`
         html, body {
           margin: 0; padding: 0;
-          background: #050505; /* Darker clean bg */
+          background: #050505;
           color: #eee;
           font-family: 'Inter', sans-serif;
           overflow-x: hidden;
@@ -506,7 +493,7 @@ export default function Home() {
         /* CONTENT */
         .contentSection { width: min(800px, 100%); margin: 0 auto; padding: 40px 20px; }
 
-        /* FEATURE GRID (NEW DESIGN) */
+        /* FEATURE GRID */
         .featureGrid {
           display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
           gap: 16px; margin-bottom: 40px;
@@ -535,7 +522,7 @@ export default function Home() {
         .fTitle { font-weight: 700; font-size: 15px; color: #fff; }
         .fDesc { font-size: 12px; color: rgba(255,255,255,0.5); line-height: 1.5; }
 
-        /* WA CARD (NEW DESIGN) */
+        /* WA CARD REVISI (Tajam & Foto Icon) */
         .waCard {
           position: relative; border-radius: 24px; overflow: hidden;
           min-height: 240px; border: 1px solid rgba(255,255,255,0.08);
@@ -543,12 +530,13 @@ export default function Home() {
         }
         .waBgImage {
             position: absolute; inset: 0; background-size: cover; background-position: center;
-            filter: blur(2px); transform: scale(1.1);
+            /* Filter blur dihapus */
+            transform: scale(1.0);
         }
         .waOverlay {
             position: absolute; inset: 0;
-            background: rgba(0,0,0,0.65); /* Overlay lebih gelap agar teks terbaca */
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.65);
+            backdrop-filter: blur(10px); /* Hanya blur konten belakang, bukan image bg sendiri */
         }
         .waContentInner {
             position: relative; z-index: 2; padding: 32px;
@@ -556,11 +544,19 @@ export default function Home() {
             height: 100%; gap: 20px;
         }
         .waTop { display: flex; align-items: center; gap: 16px; }
+        
         .waIconCircle {
-            width: 54px; height: 54px; background: #25D366; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            width: 54px; height: 54px; 
+            border-radius: 50%;
+            overflow: hidden; /* Penting agar img bulat */
+            border: 2px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            background: #000;
         }
+        .waIconImg {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+        
         .waMeta { display: flex; flex-direction: column; }
         .waTag { font-size: 10px; color: #25D366; font-weight: 800; letter-spacing: 1px; margin-bottom: 2px; }
         .waTitle { font-size: 18px; font-weight: 700; margin: 0; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
