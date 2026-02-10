@@ -1,13 +1,16 @@
 // pages/index.js
 import { useEffect, useMemo, useState } from "react";
 
+const WA_CHANNEL =
+  "https://whatsapp.com/channel/0029VbBjyjlJ93wa6hwSWa0p";
+
 const PLATFORM_BG = {
   default:
     "https://images.unsplash.com/photo-1526498460520-4c246339dccb?auto=format&fit=crop&w=1600&q=80",
   tiktok:
     "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1600&q=80",
   instagram:
-    "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=1600&q=1600&q=80",
+    "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=1600&q=80",
   youtube:
     "https://images.unsplash.com/photo-1611162616475-46b635cb6868?auto=format&fit=crop&w=1600&q=80",
   facebook:
@@ -40,7 +43,7 @@ function detectPlatform(url = "") {
   return "default";
 }
 
-function clampText(text = "", limit = 220) {
+function clampText(text = "", limit = 240) {
   if (!text) return { short: "", isLong: false };
   const isLong = text.length > limit;
   return { short: isLong ? text.slice(0, limit) + "…" : text, isLong };
@@ -61,11 +64,9 @@ function safeFilename(str = "") {
 
 function normalizeQuality(q = "") {
   const s = (q || "").toLowerCase();
-  // mapping untuk bikin label yang enak dilihat
-  if (s.includes("no_watermark") || s.includes("nowatermark") || s.includes("no-watermark"))
-    return "No Watermark";
-  if (s.includes("hd_no_watermark") || (s.includes("hd") && s.includes("no_watermark")))
+  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
     return "HD • No Watermark";
+  if (s.includes("no_watermark") || s.includes("nowatermark")) return "No Watermark";
   if (s.includes("watermark")) return "Watermark";
   if (s.includes("hd")) return "HD";
   return q || "";
@@ -73,8 +74,8 @@ function normalizeQuality(q = "") {
 
 function qualityTagKey(q = "") {
   const s = (q || "").toLowerCase();
-  // untuk filter tikTok
-  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark"))) return "hd_nw";
+  if (s.includes("hd") && (s.includes("no_watermark") || s.includes("nowatermark")))
+    return "hd_nw";
   if (s.includes("no_watermark") || s.includes("nowatermark")) return "nw";
   if (s.includes("watermark")) return "wm";
   if (s.includes("hd")) return "hd";
@@ -87,9 +88,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const [data, setData] = useState(null); // {title, source, medias:[]}
-  const [typeFilter, setTypeFilter] = useState("all"); // all|video|image|audio
-  const [qualityFilter, setQualityFilter] = useState("all"); // all|... (dynamic)
+  const [data, setData] = useState(null);
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [qualityFilter, setQualityFilter] = useState("all");
   const [showFullTitle, setShowFullTitle] = useState(false);
 
   const [previewOpen, setPreviewOpen] = useState(false);
@@ -102,23 +103,21 @@ export default function Home() {
   const bg = PLATFORM_BG[platform] || PLATFORM_BG.default;
 
   const title = data?.title || "";
-  const { short: shortTitle, isLong: titleLong } = clampText(title, 240);
+  const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
 
-  // Kumpulin opsi quality dari response (khususnya video)
   const qualityOptions = useMemo(() => {
     const medias = data?.medias || [];
     const vids = medias.filter((m) => m.type === "video");
-    const set = new Map(); // key -> label
+    const set = new Map();
+
     for (const v of vids) {
       const raw = v.quality || "";
       const key = qualityTagKey(raw);
       const label = normalizeQuality(raw) || "Other";
-      // untuk key "other" kita tetep masukin, tapi gak wajib tampil kalau kosong
       if (key === "other" && !raw) continue;
       if (!set.has(key)) set.set(key, label);
     }
 
-    // Urutan preferensi tiktok
     const order = ["hd_nw", "nw", "hd", "wm", "other"];
     const arr = [{ key: "all", label: "All Quality" }];
     for (const k of order) {
@@ -127,7 +126,6 @@ export default function Home() {
     return arr;
   }, [data]);
 
-  // Reset quality filter saat data berubah / platform berubah
   useEffect(() => {
     setQualityFilter("all");
   }, [data?.source, platform]);
@@ -141,8 +139,11 @@ export default function Home() {
 
     let out = list;
     if (typeFilter !== "all") out = out.filter((m) => m.type === typeFilter);
-    // quality filter hanya relevan untuk video
-    if (qualityFilter !== "all") out = out.filter((m) => m.type !== "video" ? true : m.qualityKey === qualityFilter);
+
+    if (qualityFilter !== "all") {
+      out = out.filter((m) => (m.type === "video" ? m.qualityKey === qualityFilter : true));
+    }
+
     return out;
   }, [data, typeFilter, qualityFilter]);
 
@@ -153,7 +154,8 @@ export default function Home() {
 
     const u = url.trim();
     if (!u) return setError("Masukkan URL dulu.");
-    if (!/^https?:\/\//i.test(u)) return setError("URL harus diawali http:// atau https://");
+    if (!/^https?:\/\//i.test(u))
+      return setError("URL harus diawali http:// atau https://");
 
     setLoading(true);
     try {
@@ -168,7 +170,9 @@ export default function Home() {
       try {
         json = JSON.parse(txt);
       } catch {
-        throw new Error("API tidak mengembalikan JSON. Pastikan API ada di pages/api/download.js");
+        throw new Error(
+          "API tidak mengembalikan JSON. Pastikan API ada di pages/api/download.js"
+        );
       }
 
       if (!res.ok || json?.error) throw new Error(json?.error || "Gagal mengambil media.");
@@ -197,6 +201,7 @@ export default function Home() {
     setPreviewItem(item);
     setPreviewOpen(true);
   }
+
   function closePreview() {
     setPreviewOpen(false);
     setPreviewItem(null);
@@ -212,7 +217,9 @@ export default function Home() {
 
   function buildDownloadLink(item) {
     const name = safeFilename(`${item.type}${item.quality ? "-" + item.quality : ""}`);
-    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(name || "download")}`;
+    return `/api/proxy?url=${encodeURIComponent(item.url)}&filename=${encodeURIComponent(
+      name || "download"
+    )}`;
   }
 
   const platformLabel = platform === "default" ? "UNKNOWN" : platform.toUpperCase();
@@ -222,6 +229,7 @@ export default function Home() {
       {/* HERO */}
       <section className="hero" style={{ backgroundImage: `url(${bg})` }}>
         <div className="heroOverlay" />
+
         <div className="heroInner">
           <div className="heroTop">
             <div className="brandRow">
@@ -236,9 +244,10 @@ export default function Home() {
           </div>
 
           <h1 className="h1">Downloader Lab</h1>
+
           <p className="sub">
-            Paste link sosial media → Preview → Download. Semua item selalu punya tombol
-            <b> Preview</b> + <b>Download</b>.
+            Paste link sosial media → Preview → Download. Semua item selalu punya tombol{" "}
+            <b>Preview</b> + <b>Download</b>.
           </p>
 
           <div className="inputRow">
@@ -262,6 +271,94 @@ export default function Home() {
         </div>
       </section>
 
+      {/* EMPTY STATE SECTION (biar gak kosong) */}
+      {!data && (
+        <>
+          <section className="miniWrap">
+            <div className="howCard">
+              <div className="howItem">
+                <span className="howNum">①</span>
+                <div>
+                  <div className="howTitle">Paste Link</div>
+                  <div className="howDesc">Masukkan link TikTok / IG / YT / FB dll.</div>
+                </div>
+              </div>
+
+              <div className="howItem">
+                <span className="howNum">②</span>
+                <div>
+                  <div className="howTitle">Preview</div>
+                  <div className="howDesc">Cek dulu video / audio / gambar.</div>
+                </div>
+              </div>
+
+              <div className="howItem">
+                <span className="howNum">③</span>
+                <div>
+                  <div className="howTitle">Download</div>
+                  <div className="howDesc">Download langsung tanpa ribet.</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="platforms">
+              Supported: TikTok • Instagram • Facebook • X • YouTube • Threads • Pinterest • Snapchat • Spotify • SoundCloud
+            </div>
+          </section>
+
+          {/* JOIN WHATSAPP CARD */}
+          <section className="miniWrap">
+            <div className="joinCard">
+              <div className="joinLeft">
+                <div className="joinTitle">Join WhatsApp Channel</div>
+                <div className="joinDesc">
+                  Dapat update fitur terbaru, tools baru, dan info project R_hmt ofc.
+                </div>
+
+                <div className="joinBadges">
+                  <span className="joinTag">Update Tools</span>
+                  <span className="joinTag">Downloader</span>
+                  <span className="joinTag">Dev Journey</span>
+                </div>
+              </div>
+
+              <div className="joinRight">
+                <a className="joinBtn" href={WA_CHANNEL} target="_blank" rel="noreferrer">
+                  Join Channel
+                </a>
+                <div className="joinSmall">WhatsApp Official Channel</div>
+              </div>
+            </div>
+          </section>
+
+          {/* EXTRA CARD (biar lebih berisi) */}
+          <section className="miniWrap">
+            <div className="extraGrid">
+              <div className="extraCard">
+                <div className="extraTitle">⚡ Fast Mode</div>
+                <div className="extraDesc">
+                  Sistem otomatis pilih kualitas terbaik jika tersedia.
+                </div>
+              </div>
+
+              <div className="extraCard">
+                <div className="extraTitle">🔒 Safe Download</div>
+                <div className="extraDesc">
+                  Download lewat proxy agar file tidak gagal di browser.
+                </div>
+              </div>
+
+              <div className="extraCard">
+                <div className="extraTitle">🎯 Preview First</div>
+                <div className="extraDesc">
+                  Preview sebelum download supaya gak salah ambil file.
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
       {/* RESULT */}
       {data && (
         <section className="panel">
@@ -269,7 +366,6 @@ export default function Home() {
             <h2 className="h2">Result</h2>
 
             <div className="filtersWrap">
-              {/* Type filter */}
               <div className="filters">
                 {["all", "video", "image", "audio"].map((t) => (
                   <button
@@ -282,10 +378,9 @@ export default function Home() {
                 ))}
               </div>
 
-              {/* Quality filter (mencolok, muncul kalau ada opsi video quality) */}
               {qualityOptions.length > 1 && (
                 <div className="qFilters">
-                  <div className="qTitle">Quality</div>
+                  <div className="qTitle">Quality Filter</div>
                   <div className="qRow">
                     {qualityOptions.map((q) => (
                       <button
@@ -331,7 +426,7 @@ export default function Home() {
                 <div className="left">
                   <div className="typeRow">
                     <span className="type">{m.type.toUpperCase()}</span>
-                    {m.qualityLabel ? <span className="quality">{m.qualityLabel}</span> : null}
+                    {m.quality ? <span className="quality">{normalizeQuality(m.quality)}</span> : null}
                   </div>
                   <div className="small">{shortUrl(m.url, 70)}</div>
                 </div>
@@ -390,9 +485,11 @@ export default function Home() {
         </div>
       )}
 
-      <footer className="footer">© {new Date().getFullYear()} R_hmt ofc • Full width • Desktop ready</footer>
+      <footer className="footer">
+        © {new Date().getFullYear()} R_hmt ofc • Downloader Lab
+      </footer>
 
-      {/* Global + Page CSS */}
+      {/* GLOBAL CSS */}
       <style jsx global>{`
         html,
         body,
@@ -402,13 +499,14 @@ export default function Home() {
           margin: 0;
           padding: 0;
           background: #060812;
-          overflow-x: hidden; /* ini yang ngehilangin putih di samping */
+          overflow-x: hidden;
         }
         * {
           box-sizing: border-box;
         }
       `}</style>
 
+      {/* PAGE CSS */}
       <style jsx>{`
         .page {
           min-height: 100vh;
@@ -418,13 +516,13 @@ export default function Home() {
             linear-gradient(180deg, #060812, #0b0f1c);
           color: rgba(255, 255, 255, 0.9);
           font-family: Arial, sans-serif;
-          padding: 0 0 42px;
+          padding-bottom: 42px;
         }
 
-        /* Full width container, tapi tetap enak di desktop */
         .hero,
         .panel,
-        .footer {
+        .footer,
+        .miniWrap {
           width: min(1100px, calc(100% - 24px));
           margin-left: auto;
           margin-right: auto;
@@ -433,7 +531,7 @@ export default function Home() {
         .hero {
           margin-top: 14px;
           border-radius: 18px;
-          min-height: 420px;
+          min-height: 360px;
           background-size: cover;
           background-position: center;
           border: 1px solid rgba(255, 255, 255, 0.1);
@@ -442,10 +540,16 @@ export default function Home() {
           overflow: hidden;
         }
 
+        @media (min-width: 1024px) {
+          .hero {
+            min-height: 430px;
+          }
+        }
+
         .heroOverlay {
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.5), rgba(11, 15, 28, 1));
+          background: linear-gradient(180deg, rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.55), rgba(11, 15, 28, 1));
         }
 
         .heroInner {
@@ -471,6 +575,7 @@ export default function Home() {
           gap: 10px;
           flex-wrap: wrap;
         }
+
         .brandDot {
           width: 12px;
           height: 12px;
@@ -478,10 +583,12 @@ export default function Home() {
           background: linear-gradient(135deg, rgba(55, 245, 255, 1), rgba(155, 92, 255, 1), rgba(255, 79, 216, 1));
           box-shadow: 0 0 18px rgba(55, 245, 255, 0.18);
         }
+
         .brandText {
           font-weight: 900;
           letter-spacing: 0.2px;
         }
+
         .brandSub {
           color: rgba(255, 255, 255, 0.65);
           font-size: 12px;
@@ -544,6 +651,7 @@ export default function Home() {
           background: rgba(255, 255, 255, 0.92);
           color: rgba(0, 0, 0, 0.92);
         }
+
         .btnMain:disabled {
           opacity: 0.6;
           cursor: not-allowed;
@@ -561,6 +669,166 @@ export default function Home() {
           margin-top: 2px;
         }
 
+        .miniWrap {
+          margin-top: 14px;
+        }
+
+        .howCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
+          padding: 14px;
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+
+        @media (max-width: 800px) {
+          .howCard {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .howItem {
+          display: flex;
+          gap: 12px;
+          align-items: flex-start;
+          padding: 12px;
+          border-radius: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: rgba(0, 0, 0, 0.2);
+        }
+
+        .howNum {
+          width: 30px;
+          height: 30px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 900;
+          background: rgba(255, 255, 255, 0.08);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .howTitle {
+          font-weight: 900;
+          margin-bottom: 4px;
+        }
+
+        .howDesc {
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.65);
+          line-height: 1.5;
+        }
+
+        .platforms {
+          margin-top: 10px;
+          text-align: center;
+          font-size: 12px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Join Card */
+        .joinCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(0, 0, 0, 0.22);
+          padding: 16px;
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+
+        .joinTitle {
+          font-weight: 900;
+          font-size: 16px;
+        }
+
+        .joinDesc {
+          margin-top: 6px;
+          font-size: 12px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.7);
+          max-width: 60ch;
+        }
+
+        .joinBadges {
+          margin-top: 10px;
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+
+        .joinTag {
+          font-size: 11px;
+          font-weight: 900;
+          padding: 6px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          background: rgba(255, 255, 255, 0.06);
+          color: rgba(255, 255, 255, 0.75);
+        }
+
+        .joinRight {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 6px;
+        }
+
+        .joinBtn {
+          text-decoration: none;
+          padding: 12px 14px;
+          border-radius: 14px;
+          font-weight: 900;
+          border: 1px solid rgba(45, 255, 143, 0.32);
+          background: rgba(45, 255, 143, 0.16);
+          color: rgba(255, 255, 255, 0.95);
+        }
+
+        .joinSmall {
+          font-size: 11px;
+          color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Extra grid */
+        .extraGrid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+
+        @media (max-width: 900px) {
+          .extraGrid {
+            grid-template-columns: 1fr;
+          }
+          .joinRight {
+            align-items: flex-start;
+          }
+        }
+
+        .extraCard {
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background: rgba(255, 255, 255, 0.04);
+          padding: 14px;
+        }
+
+        .extraTitle {
+          font-weight: 900;
+          margin-bottom: 6px;
+        }
+
+        .extraDesc {
+          font-size: 12px;
+          line-height: 1.6;
+          color: rgba(255, 255, 255, 0.65);
+        }
+
+        /* RESULT PANEL */
         .panel {
           margin-top: 14px;
           padding: 16px;
@@ -607,30 +875,33 @@ export default function Home() {
           font-size: 12px;
           font-weight: 800;
         }
+
         .chipActive {
           background: rgba(255, 255, 255, 0.1);
           border-color: rgba(255, 255, 255, 0.2);
           color: rgba(255, 255, 255, 0.95);
         }
 
-        /* Quality filters (lebih mencolok, tapi nyatu) */
         .qFilters {
           border-radius: 16px;
           border: 1px solid rgba(255, 255, 255, 0.12);
           background: rgba(0, 0, 0, 0.22);
           padding: 10px;
         }
+
         .qTitle {
           font-size: 12px;
           font-weight: 900;
           color: rgba(255, 255, 255, 0.82);
           margin-bottom: 8px;
         }
+
         .qRow {
           display: flex;
           gap: 8px;
           flex-wrap: wrap;
         }
+
         .qChip {
           padding: 9px 12px;
           border-radius: 14px;
@@ -641,6 +912,7 @@ export default function Home() {
           font-size: 12px;
           font-weight: 900;
         }
+
         .qActive {
           border-color: rgba(45, 255, 143, 0.32);
           background: rgba(45, 255, 143, 0.16);
@@ -664,6 +936,7 @@ export default function Home() {
           text-decoration: none;
           word-break: break-word;
         }
+
         .link:hover {
           text-decoration: underline;
         }
@@ -752,7 +1025,7 @@ export default function Home() {
         }
 
         .footer {
-          margin-top: 20px;
+          margin-top: 18px;
           padding: 10px 0 0;
           color: rgba(255, 255, 255, 0.55);
           font-size: 12px;
