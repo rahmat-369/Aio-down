@@ -1,22 +1,6 @@
 // pages/index.js
 import { useEffect, useMemo, useRef, useState } from "react";
 
-/**
- * ✅ FULL 1 FILE (pages/index.js)
- * ✅ UI REWORK TOTAL (dashboard feel, tidak kosong, lebih "produk")
- * ✅ Mobile + Desktop/DeX friendly
- * ✅ Tidak ada header/navbar atas
- * ✅ Tetap fitur inti:
- *    - Fetch media: POST /api/download { url }
- *    - Download always: /api/proxy?url=...&filename=...
- *    - Preview modal (img/vid/aud)
- *    - Filter type: ALL/VIDEO/IMAGE/AUDIO
- *    - Quality filter (mencolok tapi nyatu)
- *    - Title panjang collapse "lihat semua"
- *    - Semua item punya tombol Preview + Download (termasuk foto)
- * ✅ Join WA card + logo WA + nama channel yang benar
- */
-
 const DEV_NAME = "R_hmt ofc";
 const SITE_NAME = "Downloader Lab";
 const SITE_TAGLINE = "Preview → Download. Semua media selalu punya tombol Preview + Download.";
