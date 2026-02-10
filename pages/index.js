@@ -17,6 +17,20 @@ const PLATFORM_BG = {
   spotify: "https://images.unsplash.com/photo-1614680376593-902f74cf0d41?auto=format&fit=crop&w=1600&q=80",
 };
 
+// --- ICON WHATSAPP (SVG) ---
+const WhatsAppIcon = () => (
+  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path 
+      d="M12.031 2C6.508 2 2.009 6.49 2 12.016c0 1.77.463 3.447 1.272 4.908l-1.349 4.925 5.042-1.322c1.436.784 3.076 1.236 4.814 1.236 5.523 0 10.017-4.49 10.017-10.017C21.795 6.49 17.554 2 12.031 2zM12.03 20.25c-1.503 0-2.923-.404-4.167-1.11l-2.92.766.78-2.853a8.17 8.17 0 0 1-1.206-4.288c0-4.52 3.676-8.2 8.2-8.2s8.2 3.676 8.2 8.2c0 4.524-3.676 8.2-8.2 8.2z" 
+      fill="#fff" opacity="0.4"
+    />
+    <path 
+      d="M16.735 14.478c-.26-.13-1.538-.76-1.776-.846-.237-.086-.41-.13-.582.13-.173.258-.67.845-.82.1.02-.152.022-.26-.065-.54-.236-.28-.13-.586-.258-.888-.388-.302-.13-.52-.086-.714.237-.194.323-.043.603.13.948.172.344.757.56 1.83 1.023 2.89.605 1.303 1.055 1.583 1.256 1.052.197.393.593.364.914.344.323-.043 1.538-.649 1.754-1.255.216-.606.216-1.124.152-1.233-.065-.107-.237-.172-.496-.301z" 
+      fill="#fff"
+    />
+  </svg>
+);
+
 // --- LOGIC FUNCTIONS ---
 function detectPlatform(url = "") {
   const u = (url || "").toLowerCase();
@@ -49,15 +63,12 @@ function normalizeQuality(q = "") {
   if (s.includes("no_watermark") || s.includes("nowatermark")) return "No Watermark";
   if (s.includes("watermark")) return "Watermark";
   if (s.includes("original")) return "Original";
-  return q || "Standard"; // Fallback text
+  return q || "Standard"; 
 }
 
-// --- NEW: LOGIC SORTING QUALITY ---
 function getQualityScore(quality = "", type = "") {
   const q = quality.toLowerCase();
   let score = 0;
-
-  // 1. Deteksi Resolusi Video (Angka)
   if (q.includes("8k") || q.includes("4320")) score += 100;
   else if (q.includes("4k") || q.includes("2160")) score += 90;
   else if (q.includes("2k") || q.includes("1440")) score += 80;
@@ -68,19 +79,15 @@ function getQualityScore(quality = "", type = "") {
   else if (q.includes("240")) score += 30;
   else if (q.includes("144")) score += 20;
 
-  // 2. Deteksi Audio Bitrate
   if (type === "audio") {
     if (q.includes("320")) score += 50;
     else if (q.includes("256")) score += 40;
     else if (q.includes("192")) score += 30;
     else if (q.includes("128")) score += 20;
-    else score += 10; // Audio default
+    else score += 10;
   }
-
-  // 3. Bonus untuk "No Watermark" atau "HD" non-angka
-  if (q.includes("no watermark") || q.includes("nowatermark")) score += 1000; // Prioritas utama
-  if (q.includes("hd") && !q.match(/\d/)) score += 65; // HD tanpa angka (setara > 720p)
-
+  if (q.includes("no watermark") || q.includes("nowatermark")) score += 1000;
+  if (q.includes("hd") && !q.match(/\d/)) score += 65; 
   return score;
 }
 
@@ -105,22 +112,16 @@ export default function Home() {
   const title = data?.title || "";
   const { short: shortTitle, isLong: titleLong } = clampText(title, 260);
 
-  // --- LOGIC SORTING DI SINI ---
   const medias = useMemo(() => {
     let list = (data?.medias || []).map((m) => ({
       ...m,
       qualityLabel: normalizeQuality(m.quality || ""),
-      score: getQualityScore(m.quality || "", m.type) // Hitung skor kualitas
+      score: getQualityScore(m.quality || "", m.type)
     }));
-
-    // 1. Filter Type
     if (typeFilter !== "all") {
       list = list.filter((m) => m.type === typeFilter);
     }
-
-    // 2. Sorting (Highest Score First)
     list.sort((a, b) => b.score - a.score);
-
     return list;
   }, [data, typeFilter]);
 
@@ -168,7 +169,6 @@ export default function Home() {
 
   return (
     <div className="page">
-      {/* HEADER */}
       <header className="header">
         <div className="brandLeft">
           <div className="logoWrapper">
@@ -179,14 +179,13 @@ export default function Home() {
             <span className="brandSub">Dev Tools</span>
           </div>
         </div>
-        
         <div className="systemStatus">
           <div className="statusDot" />
           <span className="statusText">Online</span>
         </div>
       </header>
 
-      {/* HERO SECTION */}
+      {/* HERO SECTION - REVISI JARAK */}
       <section className="heroMain" style={{ backgroundImage: `url(${bg})` }}>
         <div className="heroOverlay" />
         
@@ -194,7 +193,6 @@ export default function Home() {
           <div className="heroTexts">
             <h1 className="heroTitle">
               Universal Media <br />
-              {/* REQUEST WARNA DOWNLOADER */}
               <span className="textGradient">Downloader</span>
             </h1>
             <p className="heroDesc">
@@ -275,7 +273,6 @@ export default function Home() {
                   <div className="left">
                     <div className="typeRow">
                       <span className={`typeTag ${m.type}`}>{m.type}</span>
-                      {/* Tampilkan Quality Asli jika ada */}
                       <span className="qualityTag">
                          {m.quality ? m.quality : "Standard"}
                       </span>
@@ -330,7 +327,8 @@ export default function Home() {
                 <div className="waContentInner">
                     <div className="waTop">
                         <div className="waIconCircle">
-                            <img src={LOGO_URL} alt="WA Icon" className="waIconImg" />
+                            {/* REVISI: Ganti Image ke SVG Icon WA */}
+                            <WhatsAppIcon />
                         </div>
                         <div className="waMeta">
                             <span className="waTag">OFFICIAL CHANNEL</span>
@@ -377,11 +375,10 @@ export default function Home() {
         </div>
       )}
 
-      {/* STYLES */}
       <style jsx global>{`
         html, body {
           margin: 0; padding: 0;
-          background: #050505; /* Deep Black for Soft Contrast */
+          background: #050505;
           color: #f0f0f0;
           font-family: 'Inter', -apple-system, sans-serif;
           overflow-x: hidden;
@@ -395,7 +392,6 @@ export default function Home() {
       <style jsx>{`
         .page { min-height: 100vh; display: flex; flex-direction: column; }
 
-        /* HEADER */
         .header {
           position: absolute; top: 0; left: 0; right: 0;
           padding: 24px 28px;
@@ -429,12 +425,13 @@ export default function Home() {
         .statusText { font-size: 11px; font-weight: 600; color: #00ff9d; }
         @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; } 100% { opacity: 0.6; } }
 
-        /* HERO */
+        /* HERO REVISI: MIN-HEIGHT DIKURANGI AGAR DEKAT */
         .heroMain {
-          position: relative; min-height: 85vh;
+          position: relative; 
+          min-height: 60vh; /* Dikurangi dari 85vh agar tidak terlalu jauh */
           display: flex; align-items: center; justify-content: center;
           background-size: cover; background-position: center;
-          padding: 100px 20px 60px;
+          padding: 100px 20px 40px; /* Padding bawah dikurangi */
         }
         .heroOverlay {
           position: absolute; inset: 0;
@@ -447,20 +444,18 @@ export default function Home() {
         .heroTitle {
           font-size: clamp(36px, 7vw, 60px); margin: 0; line-height: 1.15; font-weight: 800; letter-spacing: -1.5px;
         }
-        /* GRADIENT TEXT - WARNA LEMBUT CYAN KE BIRU */
         .textGradient {
           background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
         .heroDesc { font-size: 16px; color: rgba(255,255,255,0.6); margin: 0; line-height: 1.6; font-weight: 400; }
 
-        /* SOFT UI INPUT CARD */
         .inputCard {
-          background: rgba(255, 255, 255, 0.03); /* Lebih transparan */
+          background: rgba(255, 255, 255, 0.03);
           backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.08); /* Border sangat halus */
+          border: 1px solid rgba(255, 255, 255, 0.08);
           border-radius: 24px; padding: 28px;
-          box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5); /* Shadow menyebar lembut */
+          box-shadow: 0 20px 50px -10px rgba(0,0,0,0.5);
           transition: transform 0.3s ease;
         }
         .inputCard:hover { transform: translateY(-2px); }
@@ -489,10 +484,9 @@ export default function Home() {
         .errorMsg { text-align: left; color: #ff6b6b; margin-top: 12px; font-size: 13px; padding-left: 4px; }
         .inputFooter { margin-top: 20px; font-size: 11px; color: rgba(255,255,255,0.3); letter-spacing: 0.5px; }
 
-        /* CONTENT */
-        .contentSection { width: min(800px, 100%); margin: 0 auto; padding: 20px 20px 60px; }
+        /* CONTENT: PADDING TOP DIHAPUS BIAR NEMPEL */
+        .contentSection { width: min(800px, 100%); margin: 0 auto; padding: 0 20px 60px; }
 
-        /* FEATURE GRID SOFT UI */
         .featureGrid {
           display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
           gap: 20px; margin-bottom: 50px;
@@ -520,7 +514,6 @@ export default function Home() {
         .fTitle { font-weight: 700; font-size: 15px; color: #fff; margin-bottom: 4px; }
         .fDesc { font-size: 13px; color: rgba(255,255,255,0.5); line-height: 1.5; }
 
-        /* WA CARD (Clear & Sharp BG) */
         .waCard {
           position: relative; border-radius: 24px; overflow: hidden;
           min-height: 220px; border: 1px solid rgba(255,255,255,0.08);
@@ -528,11 +521,11 @@ export default function Home() {
         }
         .waBgImage {
             position: absolute; inset: 0; background-size: cover; background-position: center;
-            transform: scale(1.0); /* NO BLUR */
+            transform: scale(1.0);
         }
         .waOverlay {
             position: absolute; inset: 0;
-            background: rgba(0,0,0,0.7); /* Darker overlay for text readability */
+            background: rgba(0,0,0,0.7);
         }
         .waContentInner {
             position: relative; z-index: 2; padding: 32px;
@@ -542,16 +535,16 @@ export default function Home() {
         .waTop { display: flex; align-items: center; gap: 18px; }
         
         .waIconCircle {
-            width: 56px; height: 56px; border-radius: 50%; overflow: hidden;
-            border: 2px solid rgba(255,255,255,0.15); background: #000;
+            width: 56px; height: 56px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(255,255,255,0.15); background: #25D366;
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
         }
-        .waIconImg { width: 100%; height: 100%; object-fit: cover; }
         
         .waMeta { display: flex; flex-direction: column; }
         .waTag { font-size: 10px; color: #25D366; font-weight: 800; letter-spacing: 1px; margin-bottom: 4px; }
         .waTitle { font-size: 18px; font-weight: 700; color: #fff; margin: 0; }
         .waSub { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
-        
         .waDesc { font-size: 14px; color: rgba(255,255,255,0.85); line-height: 1.6; max-width: 480px; margin: 0; }
         
         .waBtn {
@@ -567,9 +560,8 @@ export default function Home() {
             .waTop { flex-direction: column; gap: 12px; }
         }
 
-        /* RESULT PANEL SOFT UI */
         .panel {
-          background: rgba(20, 20, 20, 0.5); /* Semi transparent */
+          background: rgba(20, 20, 20, 0.5);
           border-radius: 24px;
           border: 1px solid rgba(255,255,255,0.06); padding: 24px;
           box-shadow: 0 20px 40px -10px rgba(0,0,0,0.3);
@@ -615,7 +607,6 @@ export default function Home() {
         .footer { padding: 40px 0 30px; text-align: center; }
         .footer p { font-size: 12px; color: rgba(255,255,255,0.2); }
 
-        /* MODAL */
         .modalBackdrop {
           position: fixed; inset: 0; background: rgba(0,0,0,0.8);
           backdrop-filter: blur(15px); z-index: 100;
