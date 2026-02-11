@@ -1,8 +1,23 @@
 import DownrScraper from "../../lib/downr";
+import { rateLimit } from "../../lib/rateLimit";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  // RATE LIMIT CHECK
+  const limit = rateLimit(req, {
+    cooldownMs: 2 * 60 * 1000,
+    maxPerDay: 25,
+  });
+
+  if (!limit.allowed) {
+    return res.status(limit.status).json({
+      error: limit.message,
+      remaining: limit.remaining,
+      waitSeconds: limit.waitSeconds,
+    });
   }
 
   try {
@@ -28,6 +43,7 @@ export default async function handler(req, res) {
       title: data.title || null,
       source: url,
       medias,
+      remaining: limit.remaining, // info buat frontend
     });
   } catch (err) {
     console.error("DOWNLOAD API ERROR:", err);

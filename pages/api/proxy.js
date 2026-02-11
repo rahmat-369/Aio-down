@@ -1,6 +1,21 @@
 import axios from "axios";
+import { rateLimit } from "../../lib/rateLimit";
 
 export default async function handler(req, res) {
+  // RATE LIMIT CHECK
+  const limit = rateLimit(req, {
+    cooldownMs: 30 * 1000, // proxy lebih ringan, cooldown 30 detik aja
+    maxPerDay: 200,        // limit proxy lebih tinggi
+  });
+
+  if (!limit.allowed) {
+    return res.status(limit.status).json({
+      error: limit.message,
+      remaining: limit.remaining,
+      waitSeconds: limit.waitSeconds,
+    });
+  }
+
   try {
     const { url } = req.query;
     if (!url) return res.status(400).send("URL kosong");
