@@ -1,5 +1,3 @@
-import DownrScraper from "../../lib/downr";
-import { rateLimit } from "../../lib/rateLimit";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
